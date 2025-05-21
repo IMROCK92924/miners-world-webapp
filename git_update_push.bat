@@ -3,7 +3,7 @@ cd /d %~dp0
 echo Добавление всех файлов...
 git add .
 echo Коммит...
-git commit -m "автообновление"
+git commit -m "AUTO"
 echo Пуш на GitHub...
 git push
-pause
+

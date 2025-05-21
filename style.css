@@ -1,35 +1,48 @@
+/* Основные стили для страницы */
 body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
-  background-color: #000;
-  overflow: hidden;
+  background-color: #000; /* Фоновый цвет на случай, если картинка не загрузится */
+  overflow: hidden;       /* Отключаем скролл */
 }
 
+/* Контейнер игры, центрируем и задаём размер */
 .game-container {
-  position: relative;
-  width: 320px;   /* ширина экрана */
-  height: 480px;  /* высота экрана */
-  margin: 0 auto;
+  position: relative;      /* Для абсолютного позиционирования кнопок */
+  width: 320px;            /* Ширина экрана игры */
+  height: 480px;           /* Высота экрана игры */
+  margin: 0 auto;          /* Центрируем по горизонтали */
   background-color: transparent;
-  border: 1px solid #222; /* для визуального отладки, можно убрать */
+  border: none;            /* Убраны рамки для чистого вида */
 }
 
-/* Ресурс-бар сверху */
+/* Фон растягивается на весь контейнер, сохраняя пропорции */
+.background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;       /* Сохраняет пропорции, растягивая картинку */
+  top: 0;
+  left: 0;
+  z-index: 0;              /* Фон всегда позади остальных элементов */
+}
+
+/* Ресурс-бар вверху, с равномерным распределением */
 .resource-bar {
   position: absolute;
-  top: 10px;
+  top: 96px;
   left: 0;
   right: 0;
-  display: flex;
-  justify-content: space-around;
-  z-index: 10;
+  display: flex;              /* Горизонтальное распределение */
+  justify-content: space-evenly; /* или space-between */
+  gap: 1px;                      /* можно добавить для дополнительного контроля */
   color: cyan;
-  font-size: 18px;
+  font-size: 13px;
   font-weight: bold;
 }
 
-/* Экраны с контентом */
+/* Основные экраны, которые переключаются */
 .screen {
   position: absolute;
   top: 60px;
@@ -40,35 +53,33 @@ body {
   text-align: center;
   font-size: 22px;
   padding: 10px;
-  overflow-y: auto; /* если контент длинный */
+  overflow-y: auto;        /* Скролл внутри экрана, если контента много */
   z-index: 5;
 }
 
-/* Кнопки в своих контейнерах с абсолютным позиционированием */
+/* Общие стили для кнопок в контейнерах */
 .button-home,
 .button-inventory,
 .button-market,
 .button-mining {
   position: absolute;
   cursor: pointer;
-  /* Отладочные рамки, чтобы видеть зоны кнопок */
-  border: 1px dashed cyan;
+  user-select: none;        /* Запрет выделения текста */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  user-select: none;
 }
 
-/* Кнопки внутри контейнеров */
+/* Сброс стилей у кнопок */
 .button-home button,
 .button-inventory button,
 .button-market button,
 .button-mining button {
-  all: unset; /* сброс стилей кнопки */
+  all: unset;
   display: block;
   width: 100%;
   height: 100%;
 }
 
-/* Картинки в кнопках */
+/* Стили картинок в кнопках */
 .button-home img,
 .button-inventory img,
 .button-market img,
@@ -77,10 +88,10 @@ body {
   height: auto;
   filter: drop-shadow(0 0 5px cyan);
   transition: filter 0.3s ease, transform 0.3s ease;
-  pointer-events: none; /* чтобы клик попадал на кнопку, а не картинку */
+  pointer-events: none; /* Чтобы клик попадал на кнопку, а не на картинку */
 }
 
-/* Эффекты наведения и нажатия */
+/* Эффекты при наведении курсора */
 .button-home:hover,
 .button-inventory:hover,
 .button-market:hover,
@@ -88,6 +99,8 @@ body {
   transform: scale(1.1);
   box-shadow: 0 0 15px #0ff;
 }
+
+/* Эффекты при нажатии кнопки */
 .button-home:active,
 .button-inventory:active,
 .button-market:active,
@@ -96,32 +109,31 @@ body {
   box-shadow: 0 0 25px #0ff;
 }
 
-/* Конкретные позиции — подставь свои координаты и размеры */
-
+/* Позиции и размеры кнопок (поправлены под экран) */
 .button-home {
-  top: 1189px;
-  left: 436px;
-  width: 150px;
-  height: 100px;
+  top:363px;
+  left: 130px;
+  width: 60px;
+  height: 50px;
 }
 
 .button-inventory {
-  top: 1159px;
-  left: 165px;
-  width: 180px;
-  height: 140px;
+  top:360px;
+  left: 55px;
+  width: 50px;
+  height: 50px;
 }
 
 .button-market {
-  top: 1190px;
-  left: 680px;
-  width: 180px;
-  height: 100px;
+  top:363px;
+  left: 216px;
+  width: 50px;
+  height: 50px;
 }
 
 .button-mining {
-  top: 1354px;
-  left: 356px;
-  width: 300px;
-  height: 80px;
+  top:410px;
+  left: 120px;
+  width: 80px;
+  height: 50px;
 }
