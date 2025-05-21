@@ -125,3 +125,61 @@ body, html {
   width: 50%;
   aspect-ratio: 6 / 1;
 }
+
+/* Очень маленькие экраны — например, iPhone SE */
+@media (max-width: 320px) {
+  .game-container {
+    max-width: 320px;
+    height: 480px;
+  }
+  .button-home, .button-inventory, .button-market, .button-mining {
+    width: 50px;
+    height: 50px;
+  }
+  /* Можно уменьшить шрифты и отступы */
+  .resource-bar {
+    font-size: 12px;
+    gap: 8px;
+  }
+  .screen {
+    font-size: 18px;
+  }
+}
+
+/* Маленькие телефоны — до 480px ширины */
+@media (max-width: 480px) {
+  .game-container {
+    max-width: 360px;
+    height: 640px;
+  }
+  .button-home, .button-inventory, .button-market, .button-mining {
+    width: 60px;
+    height: 60px;
+  }
+  .resource-bar {
+    font-size: 14px;
+    gap: 10px;
+  }
+  .screen {
+    font-size: 20px;
+  }
+}
+
+/* Средние телефоны и планшеты — до 768px */
+@media (max-width: 768px) {
+  .game-container {
+    max-width: 480px;
+    height: 800px;
+  }
+  .button-home, .button-inventory, .button-market, .button-mining {
+    width: 80px;
+    height: 80px;
+  }
+  .resource-bar {
+    font-size: 16px;
+    gap: 15px;
+  }
+  .screen {
+    font-size: 22px;
+  }
+}
