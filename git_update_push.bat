@@ -1,0 +1,9 @@
+@echo off
+cd /d %~dp0
+echo Добавление всех файлов...
+git add .
+echo Коммит...
+git commit -m "автообновление"
+echo Пуш на GitHub...
+git push
+pause
