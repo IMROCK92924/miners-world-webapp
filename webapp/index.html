@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TON Farm Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="game-container">
+    <img src="assets/background.png" class="background" alt="background">
+
+    <div class="resource-bar">
+      <span id="iridium">123</span>
+      <span id="rubidium">123</span>
+      <span id="fel">123</span>
+    </div>
+
+    <div class="screen" id="home">🏠 Добро пожаловать в Home!</div>
+    <div class="screen" id="inventory" style="display:none;">🎒 Ваш инвентарь</div>
+    <div class="screen" id="market" style="display:none;">💰 Добро пожаловать на рынок</div>
+    <div class="screen" id="mining" style="display:none;">⛏ Тут вы добываете ресурсы</div>
+
+    <div class="button-bar">
+      <button onclick="showScreen('home')"><img src="assets/btn_home.png" alt="home"></button>
+      <button onclick="showScreen('inventory')"><img src="assets/btn_inventory.png" alt="inventory"></button>
+      <button onclick="showScreen('market')"><img src="assets/btn_market.png" alt="market"></button>
+      <button onclick="showScreen('mining')"><img src="assets/btn_mining.png" alt="mining"></button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
