@@ -1,3 +1,4 @@
+
 body {
   margin: 0;
   padding: 0;
@@ -5,13 +6,11 @@ body {
   background-color: #000;
   overflow: hidden;
 }
-
 .game-container {
   position: relative;
   width: 100vw;
   height: 100vh;
 }
-
 .background {
   position: absolute;
   width: 100%;
@@ -19,7 +18,6 @@ body {
   object-fit: cover;
   z-index: 1;
 }
-
 .resource-bar {
   position: absolute;
   top: 15px;
@@ -31,17 +29,43 @@ body {
   font-size: 20px;
   font-weight: bold;
 }
-
+.screen {
+  position: absolute;
+  top: 80px;
+  left: 0;
+  right: 0;
+  bottom: 100px;
+  color: cyan;
+  text-align: center;
+  font-size: 22px;
+  padding: 20px;
+  z-index: 2;
+}
 .button-bar {
   position: absolute;
   bottom: 20px;
   width: 100%;
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  gap: 20px;
   z-index: 2;
 }
-
 .button-bar button {
   background: none;
   border: none;
+  padding: 0;
+}
+.button-bar button img {
+  width: 100px;
+  height: auto;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  filter: drop-shadow(0 0 5px cyan);
+}
+.button-bar button img:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 10px #0ff);
+}
+.button-bar button img:active {
+  transform: scale(0.95);
+  filter: drop-shadow(0 0 20px #0ff);
 }

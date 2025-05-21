@@ -16,11 +16,16 @@
       <span id="fel">123</span>
     </div>
 
+    <div class="screen" id="home">🏠 Добро пожаловать в Home!</div>
+    <div class="screen" id="inventory" style="display:none;">🎒 Ваш инвентарь</div>
+    <div class="screen" id="market" style="display:none;">💰 Добро пожаловать на рынок</div>
+    <div class="screen" id="mining" style="display:none;">⛏ Тут вы добываете ресурсы</div>
+
     <div class="button-bar">
-      <button><img src="assets/btn_home.png" alt="home"></button>
-      <button><img src="assets/btn_inventory.png" alt="inventory"></button>
-      <button><img src="assets/btn_market.png" alt="market"></button>
-      <button><img src="assets/btn_mining.png" alt="mining"></button>
+      <button onclick="showScreen('home')"><img src="assets/btn_home.png" alt="home"></button>
+      <button onclick="showScreen('inventory')"><img src="assets/btn_inventory.png" alt="inventory"></button>
+      <button onclick="showScreen('market')"><img src="assets/btn_market.png" alt="market"></button>
+      <button onclick="showScreen('mining')"><img src="assets/btn_mining.png" alt="mining"></button>
     </div>
   </div>
 
