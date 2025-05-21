@@ -1,8 +1,5 @@
 function showScreen(name) {
-  const screens = document.querySelectorAll('.screen');
-  screens.forEach(screen => (screen.style.display = 'none'));
+  document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
   const target = document.getElementById(name);
-  if (target) {
-    target.style.display = 'block';
-  }
+  if (target) target.classList.add('active');
 }
