@@ -1,84 +1,82 @@
 /* Основные стили для страницы */
-body, html {
-  margin: 0; /* Убираем отступы по умолчанию */
-  padding: 0; /* Убираем внутренние отступы */
-  height: 100%; /* Высота страницы 100% окна */
-  width: 100%; /* Ширина страницы 100% окна */
-  font-family: sans-serif; /* Шрифт без засечек */
-  background-color: #000; /* Чёрный фон на случай, если картинка не загрузится */
-  overflow: hidden; /* Отключаем прокрутку страницы */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background-color: #000; /* Фоновый цвет на случай, если картинка не загрузится */
+  overflow: hidden;       /* Отключаем скролл */
 }
 
-/* Основной контейнер игры */
+/* Контейнер игры, центрируем и задаём размер */
 .game-container {
-  position: relative; /* Чтобы внутри него кнопки с абсолютным позиционированием работали */
-  width: 100vw; /* Ширина на весь экран устройства */
-  height: 100vh; /* Высота на весь экран устройства */
-  background-color: transparent; /* Прозрачный фон */
-  overflow: hidden; /* Скрываем лишнее, что выходит за рамки */
+  position: absolute;      /* Для абсолютного позиционирования кнопок */
+  width: 320px;            /* Ширина экрана игры */
+  height: 480px;           /* Высота экрана игры */
+  margin: 0 auto;          /* Центрируем по горизонтали */
+  background-color: transparent;
+  border: none;            /* Убраны рамки для чистого вида */
 }
 
-/* Фон, который растягивается на весь контейнер */
+/* Фон растягивается на весь контейнер, сохраняя пропорции */
 .background {
-  position: absolute; /* Фон позиционируется относительно .game-container */
-  width: 100%; /* Занимает всю ширину контейнера */
-  height: 100%; /* Занимает всю высоту контейнера */
-  object-fit: cover; /* Растягивает фон, сохраняя пропорции, обрезая лишнее */
-  top: 0; /* Сдвигаем к верхнему краю */
-  left: 0; /* Сдвигаем к левому краю */
-  z-index: 0; /* Фон ниже всех остальных элементов */
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;       /* Сохраняет пропорции, растягивая картинку */
+  top: 0;
+  left: 0;
+  z-index: 0;              /* Фон всегда позади остальных элементов */
 }
 
-/* Панель ресурсов сверху */
+/* Ресурс-бар вверху, с равномерным распределением */
 .resource-bar {
-  position: absolute; /* Абсолютное позиционирование */
-  top: 20px; /* Отступ сверху */
-  left: 0; /* Отступ слева */
-  right: 0; /* Отступ справа — растягивает панель по ширине */
-  display: flex; /* Горизонтальное расположение элементов */
-  justify-content: center; /* Центрируем ресурсы по горизонтали */
-  gap: 15px; /* Расстояние между ресурсами */
-  z-index: 10; /* Поверх остальных элементов */
-  color: cyan; /* Цвет текста */
-  font-size: 14px; /* Размер шрифта */
-  font-weight: bold; /* Жирность шрифта */
+  position: absolute;
+  top: 96px;
+  left: 0;
+  right: 0;
+  display: flex;              /* Горизонтальное распределение */
+  justify-content: space-evenly; /* или space-between */
+  gap: 1px;                      /* можно добавить для дополнительного контроля */
+  color: cyan;
+  font-size: 13px;
+  font-weight: bold;
 }
 
-/* Основные экраны (таблы), которые показываем/скрываем */
+/* Основные экраны, которые переключаются */
 .screen {
-  position: absolute; /* Абсолютное позиционирование */
-  top: 70px; /* Отступ сверху */
-  left: 10px; /* Отступ слева */
-  right: 10px; /* Отступ справа */
-  bottom: 100px; /* Отступ снизу */
-  color: cyan; /* Цвет текста */
-  text-align: center; /* Выравнивание текста по центру */
-  font-size: 22px; /* Размер шрифта */
-  padding: 10px; /* Внутренние отступы */
-  overflow-y: auto; /* Вертикальная прокрутка, если много текста */
-  z-index: 5; /* Поверх фона, но под кнопками */
+  position: absolute;
+  top: 60px;
+  left: 10px;
+  right: 10px;
+  bottom: 120px;
+  color: cyan;
+  text-align: center;
+  font-size: 22px;
+  padding: 10px;
+  overflow-y: auto;        /* Скролл внутри экрана, если контента много */
+  z-index: 5;
 }
 
-/* Контейнеры для каждой кнопки с абсолютным позиционированием */
+/* Общие стили для кнопок в контейнерах */
 .button-home,
 .button-inventory,
 .button-market,
 .button-mining {
-  position: absolute; /* Абсолютное позиционирование */
-  cursor: pointer; /* Курсор «рука» при наведении */
-  user-select: none; /* Запрет выделения текста при клике */
-  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Плавное появление эффектов */
+  position: absolute;
+  cursor: pointer;
+  user-select: none;        /* Запрет выделения текста */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Сброс стилей у кнопок внутри контейнеров */
+/* Сброс стилей у кнопок */
 .button-home button,
 .button-inventory button,
 .button-market button,
 .button-mining button {
-  all: unset; /* Убираем все стандартные стили */
-  display: block; /* Блочное отображение для полной ширины и высоты */
-  width: 100%; /* Кнопка занимает весь контейнер */
-  height: 100%; /* Кнопка занимает весь контейнер */
+  all: unset;
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 /* Стили картинок в кнопках */
@@ -86,10 +84,10 @@ body, html {
 .button-inventory img,
 .button-market img,
 .button-mining img {
-  width: 100%; /* Картинка занимает весь контейнер */
-  height: auto; /* Высота подстраивается пропорционально */
-  filter: drop-shadow(0 0 5px cyan); /* Неоновая тень вокруг картинки */
-  transition: filter 0.3s ease, transform 0.3s ease; /* Плавное появление эффектов */
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 5px cyan);
+  transition: filter 0.3s ease, transform 0.3s ease;
   pointer-events: none; /* Чтобы клик попадал на кнопку, а не на картинку */
 }
 
@@ -98,45 +96,44 @@ body, html {
 .button-inventory:hover,
 .button-market:hover,
 .button-mining:hover {
-  transform: scale(1.1); /* Увеличение кнопки */
-  box-shadow: 0 0 15px #0ff; /* Яркая тень */
+  transform: scale(1.1);
+  box-shadow: 0 0 15px #0ff;
 }
 
-/* Эффекты при нажатии */
+/* Эффекты при нажатии кнопки */
 .button-home:active,
 .button-inventory:active,
 .button-market:active,
 .button-mining:active {
-  transform: scale(0.95); /* Уменьшение кнопки */
-  box-shadow: 0 0 25px #0ff; /* Ещё более яркая тень */
+  transform: scale(0.95);
+  box-shadow: 0 0 25px #0ff;
 }
 
-/* Позиции и размеры кнопок на экране */
-/* Изменяй значения top, left, width, height, чтобы подогнать под фон */
+/* Позиции и размеры кнопок (поправлены под экран) */
 .button-home {
-  top: 360px; /* Отступ сверху */
-  left: 130px; /* Отступ слева */
-  width: 60px; /* Ширина кнопки */
-  height: 60px; /* Высота кнопки */
+  top:363px;
+  left: 130px;
+  width: 60px;
+  height: 50px;
 }
 
 .button-inventory {
-  top: 360px;
-  left: 50px;
-  width: 60px;
-  height: 60px;
+  top:360px;
+  left: 55px;
+  width: 50px;
+  height: 50px;
 }
 
 .button-market {
-  top: 360px;
-  left: 210px;
-  width: 60px;
-  height: 60px;
+  top:363px;
+  left: 216px;
+  width: 50px;
+  height: 50px;
 }
 
 .button-mining {
-  top: 420px;
-  left: 115px;
-  width: 90px;
+  top:410px;
+  left: 120px;
+  width: 80px;
   height: 50px;
 }
