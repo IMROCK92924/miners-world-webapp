@@ -4,6 +4,8 @@ body, html {
   height: 100%;
   background-color: black;
   overflow: hidden;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .wrapper {
@@ -21,10 +23,11 @@ body, html {
 }
 
 .game {
-  position: relative;
+  position: absolute;
   width: 390px;
   height: 844px;
   font-family: 'Arial', sans-serif;
+  overflow: hidden;
 }
 
 .bg {
@@ -57,7 +60,7 @@ body, html {
 #home       { left: 150px; top: 700px; }
 #inventory  { left: 260px; top: 700px; }
 #market     { left: 40px;  top: 700px; }
-#mining     {left: 32px;top: 754px;width: 325px;height: 50px;}
+#mining     { left: 68px;  top: 790px; width: 256px; height: 40px; }
 
 .btn:hover {
   transform: scale(1.1);
@@ -83,10 +86,46 @@ body, html {
   left: 50%;
   width: 376px;
   height: 647px;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) scale(0.7);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   z-index: 20;
   pointer-events: auto;
+  animation: popup 0.3s ease forwards;
+}
+
+@keyframes popup {
+  from {
+    transform: translate(-50%, -50%) scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+.center-text {
+  color: #00ffff;
+  font-size: 20px;
+  text-align: center;
+  padding-top: 40%;
+}
+
+/* Анимация модального окна */
+.modal {
+  animation: popup 0.3s ease forwards;
+  /* тень НЕ добавляем */
+}
+
+@keyframes popup {
+  from {
+    transform: translate(-50%, -50%) scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
 }
