@@ -10,18 +10,14 @@
   <div class="wrapper">
     <div class="scale-box">
       <div class="game">
-        <!-- Фон -->
         <img src="assets/background.png" class="bg" />
 
-        <!-- Ресурсы -->
         <div class="resource" id="irid">1234567</div>
         <div class="resource" id="rubid">1234567</div>
         <div class="resource" id="fel">1234567</div>
 
-        <!-- Модалки -->
         <div id="modal-container"></div>
 
-        <!-- Кнопки -->
         <img src="assets/btn_market.png" class="btn" id="market" />
         <img src="assets/btn_home.png" class="btn" id="home" />
         <img src="assets/btn_inventory.png" class="btn" id="inventory" />
@@ -36,15 +32,18 @@
       const designWidth = 390;
       const designHeight = 844;
 
-      const scaleX = window.innerWidth / designWidth;
-      const scaleY = window.innerHeight / designHeight;
+      const actualWidth = window.innerWidth;
+      const actualHeight = window.innerHeight;
+
+      const scaleX = actualWidth / designWidth;
+      const scaleY = actualHeight / designHeight;
       const scale = Math.min(scaleX, scaleY);
 
       const box = document.querySelector('.scale-box');
       box.style.transform = `scale(${scale})`;
 
-      const marginX = (window.innerWidth - designWidth * scale) / 2;
-      const marginY = (window.innerHeight - designHeight * scale) / 2;
+      const marginX = (actualWidth - designWidth * scale) / 2;
+      const marginY = (actualHeight - designHeight * scale) / 2;
       box.style.marginLeft = `${marginX}px`;
       box.style.marginTop = `${marginY}px`;
     }
