@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
   const modalContainer = document.getElementById("modal-container");
 
