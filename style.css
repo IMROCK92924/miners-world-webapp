@@ -1,185 +1,53 @@
-body, html {
-  margin: 0; padding: 0; height: 100%; width: 100%;
-  background: #000;
-  font-family: sans-serif;
-  overflow: hidden;
-}
-
-.game-container {
+.game {
   position: relative;
-  width: 100vw;
-  height: 100vh;
-  max-width: 320px;
-  max-height: 480px;
-  margin: 0 auto;
-  overflow: hidden;
+  width: 390px;
+  height: 844px;
+  margin: auto;
+  background-color: black;
+  font-family: 'Arial', sans-serif;
 }
 
-.background {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+.bg {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  z-index: 0;
 }
 
-.resource-bar {
+.resource {
   position: absolute;
-  top: 20px; left: 0; right: 0;
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  color: cyan;
-  font-weight: bold;
+  color: #00ffff;
   font-size: 14px;
+  text-shadow: 0 0 5px #00ffff;
+}
+
+#irid    { top: 26px;  left: 81px; }
+#rubid   { top: 26px;  left: 197px; }
+#fel     { top: 26px;  left: 317px; }
+
+.btn {
+  position: absolute;
+  height: 50px;
+}
+
+#home       { left: 150px; top: 700px; width: 90px; }
+#inventory  { left: 260px; top: 700px; width: 90px; }
+#market     { left: 40px;  top: 700px; width: 90px; }
+#mining     { left: 68px;  top: 790px; width: 256px; height: 40px; }
+
+#modal-container {
+  position: absolute;
+  width: 390px;
+  height: 844px;
+  top: 0;
+  left: 0;
   z-index: 10;
 }
 
-.screen {
-  position: absolute;
-  top: 70px; left: 10px; right: 10px; bottom: 100px;
-  color: cyan;
-  text-align: center;
-  font-size: 22px;
-  padding: 10px;
-  overflow-y: auto;
-  z-index: 5;
-  display: none;
-}
-
-.screen.active {
-  display: block;
-}
-
-.button-home,
-.button-inventory,
-.button-market,
-.button-mining {
-  position: absolute;
-  cursor: pointer;
-  user-select: none;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.button-home button,
-.button-inventory button,
-.button-market button,
-.button-mining button {
-  all: unset;
-  display: block;
+.modal {
   width: 100%;
   height: 100%;
-}
-
-.button-home img,
-.button-inventory img,
-.button-market img,
-.button-mining img {
-  width: 100%;
-  height: auto;
-  filter: drop-shadow(0 0 5px cyan);
-  transition: filter 0.3s ease, transform 0.3s ease;
-  pointer-events: none;
-}
-
-.button-home:hover,
-.button-inventory:hover,
-.button-market:hover,
-.button-mining:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 15px #0ff;
-}
-
-.button-home:active,
-.button-inventory:active,
-.button-market:active,
-.button-mining:active {
-  transform: scale(0.95);
-  box-shadow: 0 0 25px #0ff;
-}
-
-.button-home {
-  top: 75%;
-  left: 40%;
-  width: 18%;
-  aspect-ratio: 1 / 1;
-}
-
-.button-inventory {
-  top: 75%;
-  left: 10%;
-  width: 15%;
-  aspect-ratio: 1 / 1;
-}
-
-.button-market {
-  top: 75%;
-  left: 70%;
-  width: 15%;
-  aspect-ratio: 1 / 1;
-}
-
-.button-mining {
-  top: 85%;
-  left: 25%;
-  width: 50%;
-  aspect-ratio: 6 / 1;
-}
-
-/* Очень маленькие экраны — например, iPhone SE */
-@media (max-width: 320px) {
-  .game-container {
-    max-width: 320px;
-    height: 480px;
-  }
-  .button-home, .button-inventory, .button-market, .button-mining {
-    width: 50px;
-    height: 50px;
-  }
-  /* Можно уменьшить шрифты и отступы */
-  .resource-bar {
-    font-size: 12px;
-    gap: 8px;
-  }
-  .screen {
-    font-size: 18px;
-  }
-}
-
-/* Маленькие телефоны — до 480px ширины */
-@media (max-width: 480px) {
-  .game-container {
-    max-width: 360px;
-    height: 640px;
-  }
-  .button-home, .button-inventory, .button-market, .button-mining {
-    width: 60px;
-    height: 60px;
-  }
-  .resource-bar {
-    font-size: 14px;
-    gap: 10px;
-  }
-  .screen {
-    font-size: 20px;
-  }
-}
-
-/* Средние телефоны и планшеты — до 768px */
-@media (max-width: 768px) {
-  .game-container {
-    max-width: 480px;
-    height: 800px;
-  }
-  .button-home, .button-inventory, .button-market, .button-mining {
-    width: 80px;
-    height: 80px;
-  }
-  .resource-bar {
-    font-size: 16px;
-    gap: 15px;
-  }
-  .screen {
-    font-size: 22px;
-  }
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
 }
