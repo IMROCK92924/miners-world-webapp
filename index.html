@@ -8,12 +8,16 @@
 </head>
 <body>
   <div class="game">
+    <!-- Фон -->
     <img src="assets/background.png" class="bg" />
 
-    <!-- Числа ресурсов -->
+    <!-- Ресурсы -->
     <div class="resource" id="irid">1234567</div>
     <div class="resource" id="rubid">1234567</div>
     <div class="resource" id="fel">1234567</div>
+
+    <!-- Контейнер для всплывающих окон -->
+    <div id="modal-container"></div>
 
     <!-- Кнопки -->
     <img src="assets/btn_market.png" class="btn" id="market" />
@@ -21,5 +25,8 @@
     <img src="assets/btn_inventory.png" class="btn" id="inventory" />
     <img src="assets/btn_mining.png" class="btn" id="mining" />
   </div>
+
+  <!-- Подключение скрипта -->
+  <script src="script.js"></script>
 </body>
 </html>
