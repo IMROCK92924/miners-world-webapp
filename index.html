@@ -4,21 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Miners World</title>
+  <title>MinningFarm</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Вся сцена в обёртке -->
   <div class="wrapper">
     <div class="scale-box">
       <div class="game">
+        <!-- Фон -->
         <img src="assets/background.png" class="bg" />
 
+        <!-- Ресурсы -->
         <div class="resource" id="irid">1234567</div>
         <div class="resource" id="rubid">1234567</div>
         <div class="resource" id="fel">1234567</div>
 
+        <!-- Модалки -->
         <div id="modal-container"></div>
 
+        <!-- Кнопки -->
         <img src="assets/btn_market.png" class="btn" id="market" />
         <img src="assets/btn_home.png" class="btn" id="home" />
         <img src="assets/btn_inventory.png" class="btn" id="inventory" />
@@ -30,25 +35,37 @@
   <script src="script.js"></script>
   <script>
     function scaleGame() {
-      const designWidth = 390;
-      const designHeight = 844;
+      const designWidth = 390;   // Ширина макета
+      const designHeight = 844;  // Высота макета
+
+      // Получаем высоту от Telegram API или fallback
+      const viewportHeight = parseFloat(
+        getComputedStyle(document.documentElement)
+          .getPropertyValue('--tg-viewport-stable-height')
+      ) || window.innerHeight;
 
       const actualWidth = window.innerWidth;
-      const actualHeight = window.innerHeight;
 
+      // Считаем масштаб по ширине и высоте
       const scaleX = actualWidth / designWidth;
-      const scaleY = actualHeight / designHeight;
-      const scale = Math.min(scaleX, scaleY);
+      const scaleY = viewportHeight / designHeight;
+      const scale = Math.min(scaleX, scaleY); // Берём минимальный
 
       const box = document.querySelector('.scale-box');
       box.style.transform = `scale(${scale})`;
 
+      // Центровка по центру экрана
       box.style.left = `${(actualWidth - designWidth * scale) / 2}px`;
-      box.style.top = `${(actualHeight - designHeight * scale) / 2}px`;
+      box.style.top = `${(viewportHeight - designHeight * scale) / 2}px`;
     }
 
     window.addEventListener('resize', scaleGame);
-    window.addEventListener('load', scaleGame);
+    window.addEventListener('load', () => {
+      if (window.Telegram?.WebApp?.expand) {
+        Telegram.WebApp.expand(); // Telegram растягивает WebView
+      }
+      scaleGame(); // Масштабируем при загрузке
+    });
   </script>
 </body>
 </html>
