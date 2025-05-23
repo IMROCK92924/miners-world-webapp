@@ -13,8 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("inventory").onclick = () => openModal("inventory");
   document.getElementById("market").onclick = () => openModal("market");
   document.getElementById("mining").onclick = () => openModal("mining");
-
-  // HOME — просто закрывает модалку
   document.getElementById("home").onclick = () => {
     modalContainer.innerHTML = "";
   };
