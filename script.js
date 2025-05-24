@@ -21,8 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // === АДАПТИВНОЕ МАСШТАБИРОВАНИЕ ===
   function scaleGame() {
-    const designWidth = 390;
-    const designHeight = 844;
+    const designWidth = 752;
+    const designHeight = 1360;
 
     const viewportHeight = parseFloat(
       getComputedStyle(document.documentElement)
