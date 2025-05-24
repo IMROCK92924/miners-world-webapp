@@ -24,8 +24,8 @@ body, html {
 
 /* Масштабируемый контейнер под дизайн */
 .scale-box {
-  width: 752px;
-  height: 1360px;
+  width: 500px;
+  height: 844px;
   position: cover;
   top: 0;
   left: 0;
@@ -34,8 +34,8 @@ body, html {
 
 /* Игровая сцена */
 .game {
-  width: 752px;
-  height: 1360px;
+  width: 500px;
+  height: 844px;
   position: absolute;
   background-image: url('assets/background.png');
   background-size: 100% 100%;
