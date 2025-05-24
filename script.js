@@ -1,37 +1,36 @@
-// Выполняем скрипт, когда весь HTML загружен
+// Выполняем код после полной загрузки HTML-документа
 document.addEventListener("DOMContentLoaded", () => {
   const modalContainer = document.getElementById("modal-container");
 
-  // === МОДАЛКИ ===
+  // === МОДАЛЬНЫЕ ОКНА ===
 
   /**
-   * Открывает модальное окно по имени (market, inventory, mining)
-   * @param {string} name - имя модалки (для загрузки соответствующего изображения)
+   * Открывает модальное окно (по имени: market, inventory, mining)
+   * @param {string} name - имя окна
    */
   function openModal(name) {
-    // Удаляем предыдущее окно, если оно было
+    // Удаляем старое окно
     modalContainer.innerHTML = "";
 
-    // Создаём div и задаём стили
+    // Создаём новое окно
     const modal = document.createElement("div");
     modal.className = "modal";
     modal.style.backgroundImage = `url('assets/modal_${name}.png')`;
 
-    // Закрытие модалки по клику
+    // Закрытие при клике
     modal.onclick = () => modal.remove();
 
-    // Вставляем модалку в контейнер
+    // Добавляем модалку в контейнер
     modalContainer.appendChild(modal);
   }
 
-  // === ПРИВЯЗКА КНОПОК ===
+  // === КНОПКИ ===
 
-  // Кнопки, открывающие модалки
   document.getElementById("inventory").onclick = () => openModal("inventory");
-  document.getElementById("market").onclick   = () => openModal("market");
-  document.getElementById("mining").onclick   = () => openModal("mining");
+  document.getElementById("market").onclick    = () => openModal("market");
+  document.getElementById("mining").onclick    = () => openModal("mining");
 
-  // Кнопка "домой" — закрывает модалку
+  // Кнопка "домой" — закрывает все модалки
   document.getElementById("home").onclick = () => {
     modalContainer.innerHTML = "";
   };
@@ -39,13 +38,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // === МАСШТАБИРОВАНИЕ ===
 
   /**
-   * Масштабирует игру под размер Telegram WebView
+   * Масштабирует .scale-box под размер Telegram WebView
    */
   function scaleGame() {
-    const designWidth = 390;   // ширина макета
-    const designHeight = 844;  // высота макета
+    const designWidth = 752;    // 👈 ширина под Telegram Desktop
+    const designHeight = 1360;  // 👈 высота под Telegram Desktop
 
-    // Получаем высоту экрана (стабильную) или fallback на окно
     const viewportHeight = parseFloat(
       getComputedStyle(document.documentElement)
         .getPropertyValue('--tg-viewport-stable-height')
@@ -53,26 +51,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const actualWidth = window.innerWidth;
 
-    // Вычисляем масштаб по ширине и высоте
     const scaleX = actualWidth / designWidth;
     const scaleY = viewportHeight / designHeight;
-    const scale = Math.min(scaleX, scaleY); // Берём наименьший масштаб, чтобы всё поместилось
+    const scale = Math.min(scaleX, scaleY); // Чтобы вся сцена влезла
 
     const box = document.querySelector('.scale-box');
     box.style.transform = `scale(${scale})`;
 
-    // Центрируем .scale-box по экрану
+    // Центровка .scale-box по центру
     box.style.left = `${(actualWidth - designWidth * scale) / 2}px`;
     box.style.top  = `${(viewportHeight - designHeight * scale) / 2}px`;
   }
 
-  // Масштабируем при загрузке
+  // Растягиваем WebView в Telegram, если возможно
   if (window.Telegram?.WebApp?.expand) {
-    Telegram.WebApp.expand(); // Telegram растягивает WebView
+    Telegram.WebApp.expand();
   }
 
-  scaleGame(); // Первый вызов
-
-  // При изменении размера окна — масштабируем заново
+  // Масштабируем при загрузке и изменении размеров окна
+  scaleGame();
   window.addEventListener('resize', scaleGame);
 });

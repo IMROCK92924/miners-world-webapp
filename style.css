@@ -15,6 +15,7 @@ body, html {
   -webkit-touch-callout: none;
 }
 
+/* Основной контейнер, подгоняется под Telegram */
 .wrapper {
   width: 100vw;
   height: var(--tg-viewport-stable-height, 100vh);
@@ -23,61 +24,59 @@ body, html {
   background-color: black;
 }
 
+/* Контейнер, масштабируется скриптом */
 .scale-box {
-  width: 500px;
-  height: 844px;
+  width: 752px;
+  height: 1360px;
   position: absolute;
   top: 0;
   left: 0;
   transform-origin: top left;
 }
 
+/* Игровая сцена */
 .game {
   position: absolute;
-  width: 500px;
-  height: 844px;
+  width: 752px;
+  height: 1360px;
   font-family: 'Arial', sans-serif;
   overflow: hidden;
 
-  /* 🔽 Добавляем фон */
   background-image: url('assets/background.png');
-  background-size: 100% 100%; /* полностью во весь блок */
-  background-size: cover;
+  background-size: 100% 100%;
+  background-position: center;
   background-repeat: no-repeat;
 }
 
-
-.bg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
+/* Ресурсы */
 .resource {
   position: absolute;
   color: #00ffff;
-  font-size: 14px;
+  font-size: 18px;
   text-shadow: 0 0 5px #00ffff;
   z-index: 3;
 }
 
-#irid    { top: 110px;  left: 56px; }
-#rubid   { top: 110px;  left: 165px; }
-#fel     { top: 110px;  left: 280px; }
+/* Позиции ресурсов под новое расширение */
+#irid    { top: 130px;  left: 120px; }
+#rubid   { top: 130px;  left: 320px; }
+#fel     { top: 130px;  left: 540px; }
 
+/* Кнопки */
 .btn {
   position: absolute;
-  height: 50px;
-  width: 90px;
+  height: 60px;
+  width: 120px;
   cursor: pointer;
   z-index: 15;
   transition: transform 0.2s ease;
 }
 
-#home       { left: 150px; top: 700px; }
-#inventory  { left: 260px; top: 700px; }
-#market     { left: 40px;  top: 700px; }
-#mining     { left: 68px;  top: 790px; width: 256px; height: 40px; }
+/* Расположение кнопок на экране */
+#home       { left: 316px; top: 1140px; }
+#inventory  { left: 516px; top: 1140px; }
+#market     { left: 120px; top: 1140px; }
+#mining     { left: 248px; top: 1240px; width: 256px; height: 50px; }
 
 .btn:hover {
   transform: scale(1.1);
@@ -87,10 +86,11 @@ body, html {
   transform: scale(0.95);
 }
 
+/* Модалки */
 #modal-container {
   position: absolute;
-  width: 390px;
-  height: 844px;
+  width: 752px;
+  height: 1360px;
   top: 0;
   left: 0;
   z-index: 10;
@@ -99,10 +99,10 @@ body, html {
 
 .modal {
   position: absolute;
-  top: 49%;
+  top: 50%;
   left: 50%;
-  width: 376px;
-  height: 647px;
+  width: 700px;
+  height: 1000px;
   transform: translate(-50%, -50%) scale(0.7);
   background-size: cover;
   background-position: center;
