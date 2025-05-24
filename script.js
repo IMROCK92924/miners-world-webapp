@@ -1,48 +1,28 @@
-// Выполняем код после полной загрузки HTML-документа
 document.addEventListener("DOMContentLoaded", () => {
   const modalContainer = document.getElementById("modal-container");
 
-  // === МОДАЛЬНЫЕ ОКНА ===
-
-  /**
-   * Открывает модальное окно (по имени: market, inventory, mining)
-   * @param {string} name - имя окна
-   */
+  // === МОДАЛКИ ===
   function openModal(name) {
-    // Удаляем старое окно
     modalContainer.innerHTML = "";
 
-    // Создаём новое окно
     const modal = document.createElement("div");
     modal.className = "modal";
     modal.style.backgroundImage = `url('assets/modal_${name}.png')`;
 
-    // Закрытие при клике
     modal.onclick = () => modal.remove();
-
-    // Добавляем модалку в контейнер
     modalContainer.appendChild(modal);
   }
 
-  // === КНОПКИ ===
-
+  // Привязка кнопок
   document.getElementById("inventory").onclick = () => openModal("inventory");
   document.getElementById("market").onclick    = () => openModal("market");
   document.getElementById("mining").onclick    = () => openModal("mining");
+  document.getElementById("home").onclick      = () => modalContainer.innerHTML = "";
 
-  // Кнопка "домой" — закрывает все модалки
-  document.getElementById("home").onclick = () => {
-    modalContainer.innerHTML = "";
-  };
-
-  // === МАСШТАБИРОВАНИЕ ===
-
-  /**
-   * Масштабирует .scale-box под размер Telegram WebView
-   */
+  // === АДАПТИВНОЕ МАСШТАБИРОВАНИЕ ===
   function scaleGame() {
-    const designWidth = 752;    // 👈 ширина под Telegram Desktop
-    const designHeight = 1360;  // 👈 высота под Telegram Desktop
+    const designWidth = 390;
+    const designHeight = 844;
 
     const viewportHeight = parseFloat(
       getComputedStyle(document.documentElement)
@@ -53,22 +33,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const scaleX = actualWidth / designWidth;
     const scaleY = viewportHeight / designHeight;
-    const scale = Math.min(scaleX, scaleY); // Чтобы вся сцена влезла
+    const scale = Math.min(scaleX, scaleY); // минимальный масштаб
 
     const box = document.querySelector('.scale-box');
     box.style.transform = `scale(${scale})`;
-
-    // Центровка .scale-box по центру
     box.style.left = `${(actualWidth - designWidth * scale) / 2}px`;
     box.style.top  = `${(viewportHeight - designHeight * scale) / 2}px`;
   }
 
-  // Растягиваем WebView в Telegram, если возможно
-  if (window.Telegram?.WebApp?.expand) {
-    Telegram.WebApp.expand();
-  }
-
-  // Масштабируем при загрузке и изменении размеров окна
+  if (window.Telegram?.WebApp?.expand) Telegram.WebApp.expand();
   scaleGame();
   window.addEventListener('resize', scaleGame);
 });
