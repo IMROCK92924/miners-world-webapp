@@ -26,7 +26,7 @@ body, html {
 .scale-box {
   width: 390px;
   height: 844px;
-  position: absolute;
+  position: cover;
   top: 0;
   left: 0;
   transform-origin: top left;
