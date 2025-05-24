@@ -39,7 +39,7 @@ body, html {
   position: absolute;
   background-image: url('assets/background.png');
   background-size: 100% 100%;
-  background-position: center;
+  background-position: cover;
   background-repeat: no-repeat;
   font-family: Arial, sans-serif;
   overflow: hidden;
