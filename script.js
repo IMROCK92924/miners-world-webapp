@@ -10,13 +10,15 @@ function openModal(name) {
   const modal = document.createElement("div");
   modal.className = "modal";
   if (name === "energy") {
-    modal.innerHTML = `
-      <input id="energyInput" class="energy-input" type="number" min="0" max="10" placeholder="0–10">
-      <div class="modal-buttons">
-        <button id="energyConfirm">OK</button>
-        <button id="energyCancel" class="cancel">CANCEL</button>
-      </div>
-    `;
+  modal.classList.add("energy"); // ✅ ДОБАВЛИВАЕМ ЭТО
+
+  modal.innerHTML = `
+    <input id="energyInput" class="energy-input" type="number" min="0" max="10" placeholder="0–10">
+    <div class="modal-buttons">
+      <button id="energyConfirm">OK</button>
+      <button id="energyCancel" class="cancel">CANCEL</button>
+    </div>
+  `;
   } else {
     modal.style.backgroundImage = `url('assets/modal_${name}.png')`;
   }
