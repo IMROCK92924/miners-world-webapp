@@ -228,8 +228,8 @@ body, html {
 
 /* Прозрачная модалка с фоном + ввод и кнопки */
 .modal.energy {
-  width: 400px;
-  height: 250px;
+  width: 588px;
+  height: 351px;
   background-image: url("assets/modal_energy.png");
   background-size: contain;
   background-repeat: no-repeat;
@@ -245,9 +245,9 @@ body, html {
   top: 45%; /* подгони под фон */
   left: 50%;
   transform: translateX(-50%);
-  width: 120px;
-  height: 40px;
-  font-size: 20px;
+  width: 226px;
+  height: 31px;
+  font-size: 21px;
   text-align: center;
   border: none;
   border-radius: 8px;
@@ -268,11 +268,11 @@ body, html {
 }
 
 .modal-buttons button {
-  width: 100px;
-  height: 40px;
-  font-size: 18px;
+  width: 145px;
+  height: 55px;
+  font-size: 26px;
   border: none;
-  border-radius: 6px;
+  border-radius: 11px;
   cursor: pointer;
   font-weight: bold;
   background-color: #0f0;
