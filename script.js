@@ -95,3 +95,12 @@ document.addEventListener("DOMContentLoaded", () => {
   scaleGame();
   window.addEventListener('resize', scaleGame);
 });
+
+
+// Блокировка прокрутки при появлении клавиатуры
+window.addEventListener('focusin', () => {
+  document.body.style.position = 'fixed';
+});
+window.addEventListener('focusout', () => {
+  document.body.style.position = '';
+});
