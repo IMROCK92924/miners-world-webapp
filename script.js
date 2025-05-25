@@ -71,25 +71,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Адаптивное масштабирование под экран
   function scaleGame() {
-    const designWidth = 720;
-    const designHeight = 1480;
+  const designWidth = 720;
+  const designHeight = 1480;
 
-    const viewportHeight = parseFloat(
-      getComputedStyle(document.documentElement)
-        .getPropertyValue('--tg-viewport-stable-height')
-    ) || window.innerHeight;
+  const viewportHeight = window.innerHeight;
+  const actualWidth = window.innerWidth;
 
-    const actualWidth = window.innerWidth;
+  const scaleX = actualWidth / designWidth;
+  const scaleY = viewportHeight / designHeight;
+  const scale = Math.min(scaleX, scaleY);
 
-    const scaleX = actualWidth / designWidth;
-    const scaleY = viewportHeight / designHeight;
-    const scale = Math.min(scaleX, scaleY);
+  const box = document.querySelector('.scale-box');
+  box.style.zoom = scale; // ✅ вместо transform: scale(...)
+  box.style.left = `${(actualWidth - designWidth * scale) / 2}px`;
+  box.style.top = `${(viewportHeight - designHeight * scale) / 2}px`;
+}
 
-    const box = document.querySelector('.scale-box');
-    box.style.transform = `scale(${scale})`;
-    box.style.left = `${(actualWidth - designWidth * scale) / 2}px`;
-    box.style.top = `${(viewportHeight - designHeight * scale) / 2}px`;
-  }
 
   if (window.Telegram?.WebApp?.expand) Telegram.WebApp.expand();
   scaleGame();
