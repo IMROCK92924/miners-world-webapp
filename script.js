@@ -45,3 +45,21 @@ document.addEventListener("DOMContentLoaded", () => {
   scaleGame();
   window.addEventListener('resize', scaleGame);
 });
+
+function setEnergyLevel(level) {
+  if (level < 0) level = 0;
+  if (level > 10) level = 10;
+
+  const energyBar = document.getElementById("energyBar");
+  energyBar.src = `assets/energy/energy_${level}.png`;
+}
+
+// пример:
+setEnergyLevel(3); // 30% энергии
+
+document.getElementById("plusButton").addEventListener("click", () => {
+  // Открыть модалку
+  openModal("energy");
+
+  // showEnergyModal(); — если модалка уже есть
+});
