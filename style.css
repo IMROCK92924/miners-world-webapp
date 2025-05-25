@@ -24,8 +24,8 @@ body, html {
 
 /* Масштабируемый контейнер под макет */
 .scale-box {
-  width: 450px; /* Размер фона по макету */
-  height: 844px;
+  width: 720px;
+  height: 1480px;
   position: absolute;
   top: 0;
   left: 0;
