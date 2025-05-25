@@ -54,24 +54,24 @@ body, html {
   z-index: 3;
 }
 
-#irid  { top: 110px; left: 56px; }
-#rubid { top: 110px; left: 165px; }
-#fel   { top: 110px; left: 280px; }
+#irid  {top: 90px;left: 68px;}
+#rubid {top: 90px;left: 197px;}
+#fel   {top: 90px;left: 326px;}
 
 /* Кнопки */
 .btn {
   position: absolute;
-  height: 50px;
-  width: 90px;
+  height: 80px;
+  width: 80px;
   cursor: pointer;
   z-index: 15;
   transition: transform 0.2s ease;
 }
 
-#home       { left: 150px; top: 700px; }
-#inventory  { left: 260px; top: 700px; }
-#market     { left: 40px;  top: 700px; }
-#mining     { left: 68px;  top: 790px; width: 256px; height: 40px; }
+#home       {left: 52px;top: 708px;}
+#inventory  { left: 140px; top: 708px; }
+#market     { left: 315px;  top: 708px; }
+#mining     {left: 230px;top: 708px;width: 80px;height: 80px;}
 
 .btn:hover {
   transform: scale(1.1);
@@ -93,10 +93,10 @@ body, html {
 
 .modal {
   position: absolute;
-  top: 50%;
+  top: 48%;
   left: 50%;
   width: 370px;
-  height: 600px;
+  height: 669px;
   transform: translate(-50%, -50%) scale(0.7);
   background-size: cover;
   background-position: center;
