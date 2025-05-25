@@ -20,13 +20,13 @@ html, body {
 .game {
   width: 100%;
   height: 100%;
-  position: relative;
   background-image: url('assets/background.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   font-family: Arial, sans-serif;
   overflow: hidden;
+  position: relative;
 }
 .resource {
   position: absolute;
@@ -35,9 +35,9 @@ html, body {
   text-shadow: 0 0 5px #00ffff;
   z-index: 3;
 }
-#irid  {top: 171px; left: 75px;}
-#rubid {top: 171px; left: 300px;}
-#fel  {top: 171px; left: 526px;}
+#irid  { top: 171px; left: 75px; }
+#rubid { top: 171px; left: 300px; }
+#fel   { top: 171px; left: 526px; }
 .btn {
   position: absolute;
   height: 150px;
@@ -46,10 +46,10 @@ html, body {
   z-index: 15;
   transition: transform 0.2s ease;
 }
-#home {left: 51px; top: 1271px;}
-#inventory {left: 362px; top: 1271px;}
-#market {left: 519px; top: 1271px;}
-#mining {left: 206px; top: 1271px;}
+#home { left: 51px; top: 1271px; }
+#inventory { left: 362px; top: 1271px; }
+#market { left: 519px; top: 1271px; }
+#mining { left: 206px; top: 1271px; }
 .energy-wrapper {
   position: absolute;
   left: 330px;
@@ -74,12 +74,12 @@ html, body {
   z-index: 9;
 }
 #modal-container {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
   top: 0;
   left: 0;
-  z-index: 10;
+  z-index: 999;
   pointer-events: none;
 }
 .modal {
@@ -93,7 +93,7 @@ html, body {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  z-index: 20;
+  z-index: 1000;
   pointer-events: auto;
 }
 .energy-input {
