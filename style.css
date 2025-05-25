@@ -118,10 +118,10 @@ body, html {
 }
 .energy-wrapper {
   position: absolute;
-  left: 400px;
+  left: 330px;
   top: 255px;
-  width: 250px;
-  height: 50px;
+  width: 300px;
+  height: 80px;
   z-index: 9;
 }
 
@@ -133,11 +133,11 @@ body, html {
 
 .energy-plus {
   position: absolute;
-  right: -25px; /* или left: 155px; */
+  right: -50px; /* или left: 155px; */
   top: 50%;
   transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
+  width: 80px;
+  height: 80px;
   cursor: pointer;
   z-index: 9;
 }

@@ -1,65 +1,151 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const modalContainer = document.getElementById("modal-container");
-
-  // === МОДАЛКИ ===
-  function openModal(name) {
-    modalContainer.innerHTML = "";
-
-    const modal = document.createElement("div");
-    modal.className = "modal";
-    modal.style.backgroundImage = `url('assets/modal_${name}.png')`;
-
-    modal.onclick = () => modal.remove();
-    modalContainer.appendChild(modal);
-  }
-
-  // Привязка кнопок
-  document.getElementById("inventory").onclick = () => openModal("inventory");
-  document.getElementById("market").onclick    = () => openModal("market");
-  document.getElementById("mining").onclick    = () => openModal("mining");
-  document.getElementById("home").onclick      = () => modalContainer.innerHTML = "";
-
-  // === АДАПТИВНОЕ МАСШТАБИРОВАНИЕ ===
-  function scaleGame() {
-  const designWidth = 720;
-  const designHeight = 1480;
-
-    const viewportHeight = parseFloat(
-      getComputedStyle(document.documentElement)
-        .getPropertyValue('--tg-viewport-stable-height')
-    ) || window.innerHeight;
-
-    const actualWidth = window.innerWidth;
-
-    const scaleX = actualWidth / designWidth;
-    const scaleY = viewportHeight / designHeight;
-    const scale = Math.min(scaleX, scaleY); // минимальный масштаб
-
-    const box = document.querySelector('.scale-box');
-    box.style.transform = `scale(${scale})`;
-    box.style.left = `${(actualWidth - designWidth * scale) / 2}px`;
-    box.style.top  = `${(viewportHeight - designHeight * scale) / 2}px`;
-  }
-
-  if (window.Telegram?.WebApp?.expand) Telegram.WebApp.expand();
-  scaleGame();
-  window.addEventListener('resize', scaleGame);
-});
-
-function setEnergyLevel(level) {
-  if (level < 0) level = 0;
-  if (level > 10) level = 10;
-
-  const energyBar = document.getElementById("energyBar");
-  energyBar.src = `assets/energy/energy_${level}.png`;
+:root {
+  height: 100%;
 }
 
-// пример:
-setEnergyLevel(3); // 30% энергии
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: black;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
 
-document.getElementById("plusButton").addEventListener("click", () => {
-  // Открыть модалку
-  openModal("energy");
+.wrapper {
+  width: 100vw;
+  height: var(--tg-viewport-stable-height, 100vh);
+  overflow: hidden;
+  position: relative;
+}
 
-  // showEnergyModal(); — если модалка уже есть
-});
+/* Масштабируемый контейнер под макет */
+.scale-box {
+  width: 720px;
+  height: 1480px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
+
+/* Игровая сцена с фоном */
+.game {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-image: url('assets/background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* Ресурсы */
+.resource {
+  position: absolute;
+  color: #00ffff;
+  font-size: 30px;
+  text-shadow: 0 0 5px #00ffff;
+  z-index: 3;
+}
+
+#irid  {top: 171px;left: 75px;}
+#rubid {top: 171px;left: 300px;}
+#fel   {top: 171px;left: 526px;}
+
+/* Кнопки */
+.btn {
+  position: absolute;
+  height: 150px;
+  width: 150px;
+  cursor: pointer;
+  z-index: 15;
+  transition: transform 0.2s ease;
+}
+
+#home       {left: 51px;top: 1271px;}
+#inventory  {left: 362px;top: 1271px;}
+#market     {left: 519px;top: 1271px;}
+#mining     {left: 206px;top: 1271px;width: ;}
+
+.btn:hover {
+  transform: scale(1.1);
+}
+.btn:active {
+  transform: scale(0.95);
+}
+
+/* Модалки */
+#modal-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.modal {
+  position: absolute;
+  top: 49%;
+  left: 50%;
+  width: 659px;
+  height: 1122px;
+  transform: translate(-50%, -50%) scale(0.7);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 20;
+  pointer-events: auto;
+  animation: popup 0.3s ease forwards;
+}
+
+@keyframes popup {
+  from {
+    transform: translate(-50%, -50%) scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+.energy-wrapper {
+  position: absolute;
+  left: 330px;
+  top: 255px;
+  width: 300px;
+  height: 80px;
+  z-index: 9;
+}
+
+.energy-wrapper img#energyBar {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.energy-plus {
+  position: absolute;
+  right: -50px; /* или left: 155px; */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 80px;
+  height: 80px;
+  cursor: pointer;
+  z-index: 9;
+}
+/* Стили модалки пополнения энергии */
+.modal.energy {
+  width: 800;
+  height: 500px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
