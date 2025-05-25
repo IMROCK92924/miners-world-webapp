@@ -49,29 +49,29 @@ body, html {
 .resource {
   position: absolute;
   color: #00ffff;
-  font-size: 14px;
+  font-size: 30px;
   text-shadow: 0 0 5px #00ffff;
   z-index: 3;
 }
 
-#irid  {top: 70px;left: 68px;}
-#rubid {top: 70px;left: 197px;}
-#fel   {top: 70px;left: 326px;}
+#irid  {top: 171px;left: 75px;}
+#rubid {top: 171px;left: 300px;}
+#fel   {top: 171px;left: 526px;}
 
 /* Кнопки */
 .btn {
   position: absolute;
-  height: 80px;
-  width: 80px;
+  height: 150px;
+  width: 150px;
   cursor: pointer;
   z-index: 15;
   transition: transform 0.2s ease;
 }
 
-#home       {left: 40px;top: 763px;}
-#inventory  {left: 136px;top: 763px;}
-#market     {left: 327px;top: 763px;}
-#mining     {left: 232px;top: 763px;width: 80px;height: 80px;}
+#home       {left: 51px;top: 1271px;}
+#inventory  {left: 362px;top: 1271px;}
+#market     {left: 519px;top: 1271px;}
+#mining     {left: 206px;top: 1271px;width: ;}
 
 .btn:hover {
   transform: scale(1.1);
