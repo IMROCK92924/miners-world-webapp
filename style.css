@@ -54,9 +54,9 @@ body, html {
   z-index: 3;
 }
 
-#irid  {top: 90px;left: 68px;}
-#rubid {top: 90px;left: 197px;}
-#fel   {top: 90px;left: 326px;}
+#irid  {top: 70px;left: 68px;}
+#rubid {top: 70px;left: 197px;}
+#fel   {top: 70px;left: 326px;}
 
 /* Кнопки */
 .btn {
@@ -68,10 +68,10 @@ body, html {
   transition: transform 0.2s ease;
 }
 
-#home       {left: 52px;top: 708px;}
-#inventory  { left: 140px; top: 708px; }
-#market     { left: 315px;  top: 708px; }
-#mining     {left: 230px;top: 708px;width: 80px;height: 80px;}
+#home       {left: 40px;top: 763px;}
+#inventory  {left: 136px;top: 763px;}
+#market     {left: 327px;top: 763px;}
+#mining     {left: 232px;top: 763px;width: 80px;height: 80px;}
 
 .btn:hover {
   transform: scale(1.1);
@@ -93,10 +93,10 @@ body, html {
 
 .modal {
   position: absolute;
-  top: 48%;
+  top: 49%;
   left: 50%;
-  width: 370px;
-  height: 669px;
+  width: 402px;
+  height: 702px;
   transform: translate(-50%, -50%) scale(0.7);
   background-size: cover;
   background-position: center;
