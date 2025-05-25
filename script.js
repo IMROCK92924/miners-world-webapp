@@ -39,15 +39,17 @@ function openModal(name) {
   if (name === "energy") {
     const input = () => parseInt(document.getElementById("energyInput").value);
 
-    document.getElementById("energyConfirm").onclick = () => {
-      const value = input();
-      if (!isNaN(value)) {
-        setEnergyLevel(value);
-        modal.remove();
-      } else {
-        alert("Enter valid number (0–10)");
-      }
-    };
+  document.getElementById("energyConfirm").onclick = () => {
+  const value = parseInt(document.getElementById("energyInput").value);
+  if (!isNaN(value)) {
+    setEnergyLevel(value);
+    document.activeElement.blur(); // ✅ Скрывает клавиатуру
+    modal.remove();
+  } else {
+    alert("Enter valid number (0–10)");
+  }
+};
+
 
     document.getElementById("energyCancel").onclick = () => modal.remove();
   }
