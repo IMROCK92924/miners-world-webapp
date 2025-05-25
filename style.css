@@ -143,9 +143,8 @@ body, html {
 }
 /* Стили модалки пополнения энергии */
 .modal.energy {
-  width: 400px;
-  height: 250px;
-  background-size: contain;
+  width: 647px;
+  height: 387px;
   background-repeat: no-repeat;
   background-position: center;
 }
