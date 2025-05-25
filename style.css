@@ -16,11 +16,13 @@ body, html {
 }
 
 .wrapper {
+  height: 100vh; /* это главный фикс */
+  max-height: 100svh; /* для современных браузеров */
   width: 100vw;
-  height: var(--tg-viewport-stable-height, 100vh);
   overflow: hidden;
   position: relative;
 }
+
 
 /* Масштабируемый контейнер под макет */
 .scale-box {
