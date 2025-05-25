@@ -8,17 +8,15 @@ function openModal(name) {
   const modalContainer = document.getElementById("modal-container");
   modalContainer.innerHTML = "";
   const modal = document.createElement("div");
-  modal.className = "modal";
+  modal.className = `modal ${name}`;
   if (name === "energy") {
-  modal.classList.add("energy"); // ✅ ДОБАВЛИВАЕМ ЭТО
-
-  modal.innerHTML = `
-    <input id="energyInput" class="energy-input" type="number" min="0" max="10" placeholder="0–10">
-    <div class="modal-buttons">
-      <button id="energyConfirm">OK</button>
-      <button id="energyCancel" class="cancel">CANCEL</button>
-    </div>
-  `;
+    modal.innerHTML = `
+      <input id="energyInput" class="energy-input" type="number" min="0" max="10" placeholder="0–10">
+      <div class="modal-buttons">
+        <button id="energyConfirm">OK</button>
+        <button id="energyCancel" class="cancel">CANCEL</button>
+      </div>
+    `;
   } else {
     modal.style.backgroundImage = `url('assets/modal_${name}.png')`;
   }
@@ -41,29 +39,29 @@ function openModal(name) {
   }
 }
 
-// Сохраняем начальную ширину окна
 let lastWidth = window.innerWidth;
 
 function scaleGame() {
   const designWidth = 720;
   const designHeight = 1480;
-  const viewportHeight = window.innerHeight;
+  const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
   const actualWidth = window.innerWidth;
-  const scaleX = actualWidth / designWidth;
-  const scaleY = viewportHeight / designHeight;
-  const scale = Math.min(scaleX, scaleY);
+  const scale = actualWidth / designWidth; // Масштаб по ширине
   const game = document.querySelector('.game');
   game.style.transform = `scale(${scale})`;
   game.style.transformOrigin = 'top left';
   const box = document.querySelector('.scale-box');
-  box.style.left = `${(actualWidth - designWidth * scale) / 2}px`;
+  box.style.width = `${designWidth}px`;
+  box.style.height = `${designHeight}px`;
+  box.style.left = `0px`;
   box.style.top = `${(viewportHeight - designHeight * scale) / 2}px`;
+  const wrapper = document.querySelector('.wrapper');
+  wrapper.style.background = 'url("assets/background.png") no-repeat center/cover';
 }
 
 function handleResize() {
-  // Если ширина не изменилась, вероятно, это клавиатура
   if (window.innerWidth === lastWidth) {
-    return; // Пропускаем пересчет масштаба
+    return;
   }
   lastWidth = window.innerWidth;
   scaleGame();
@@ -79,6 +77,12 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("plusButton").onclick = () => openModal("energy");
   setEnergyLevel(3);
   scaleGame();
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", scaleGame);
+  }
   window.addEventListener("resize", handleResize);
-  if (window.Telegram?.WebApp?.expand) Telegram.WebApp.expand();
+  if (window.Telegram?.WebApp?.expand) {
+    Telegram.WebApp.expand();
+    setTimeout(scaleGame, 200);
+  }
 });
