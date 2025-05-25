@@ -225,3 +225,61 @@ body, html {
   padding: 20px;
   box-sizing: border-box;
 }
+
+/* Прозрачная модалка с фоном + ввод и кнопки */
+.modal.energy {
+  width: 400px;
+  height: 250px;
+  background-image: url("assets/modal_energy.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  padding: 20px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Поле ввода значения энергии */
+.energy-input {
+  position: absolute;
+  top: 45%; /* подгони под фон */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 40px;
+  font-size: 20px;
+  text-align: center;
+  border: none;
+  border-radius: 8px;
+  background-color: #000000cc;
+  color: #00ffcc;
+  z-index: 2;
+}
+
+/* Кнопки OK и CANCEL */
+.modal-buttons {
+  position: absolute;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  z-index: 2;
+}
+
+.modal-buttons button {
+  width: 100px;
+  height: 40px;
+  font-size: 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #0f0;
+  color: #000;
+}
+
+.modal-buttons .cancel {
+  background-color: #444;
+  color: #fff;
+}
