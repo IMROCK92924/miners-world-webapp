@@ -1,3 +1,5 @@
+console.log('script.js: Starting initialization');
+
 // Константы
 const ENERGY_MAX = 10;
 const ENERGY_MIN = 0;
@@ -6,19 +8,10 @@ const DESIGN_HEIGHT = 1480;
 
 // Аудио эффекты
 const sounds = {
-  click: new Audio('assets/sounds/click.mp3'),
-  success: new Audio('assets/sounds/success.mp3'),
-  error: new Audio('assets/sounds/error.mp3')
+  click: null,
+  success: null,
+  error: null
 };
-
-// Воспроизведение звука
-function playSound(soundName) {
-  const sound = sounds[soundName];
-  if (sound) {
-    sound.currentTime = 0;
-    sound.play().catch(err => console.log('Audio playback failed:', err));
-  }
-}
 
 // Состояние игры
 const gameState = {
@@ -66,6 +59,15 @@ function setEnergyLevel(level) {
   gameState.energy = level;
   document.getElementById("energyBar").src = `assets/energy/energy_${level}.png`;
   saveGameState();
+}
+
+// Воспроизведение звука
+function playSound(soundName) {
+  const sound = sounds[soundName];
+  if (sound && gameState.settings.soundEnabled) {
+    sound.currentTime = 0;
+    sound.play().catch(err => console.log('Audio playback failed:', err));
+  }
 }
 
 // Debounce функция
@@ -117,9 +119,11 @@ function openModal(name) {
       const value = parseInt(input.value);
       if (!isNaN(value) && value >= ENERGY_MIN && value <= ENERGY_MAX) {
         setEnergyLevel(value);
+        playSound('success');
         document.activeElement.blur();
         modal.remove();
       } else {
+        playSound('error');
         alert(`Введите число от ${ENERGY_MIN} до ${ENERGY_MAX}`);
       }
     };
@@ -156,16 +160,21 @@ const handleResize = debounce(() => {
   scaleGame();
 }, 250);
 
-document.addEventListener("DOMContentLoaded", () => {
+// Инициализация игры
+function initGame(resourceCache) {
+  // Инициализируем звуки
+  sounds.click = resourceCache.sounds['assets/sounds/click.mp3'];
+  sounds.success = resourceCache.sounds['assets/sounds/success.mp3'];
+  sounds.error = resourceCache.sounds['assets/sounds/error.mp3'];
+
+  // Скрываем экран загрузки и показываем игру
+  document.getElementById('loading-screen').style.display = 'none';
+  document.querySelector('.wrapper').style.display = 'block';
+
   // Загружаем сохраненное состояние
   loadGameState();
   
-  // Инициализируем обработчики событий с звуками
-  const buttons = document.querySelectorAll('.btn');
-  buttons.forEach(btn => {
-    btn.addEventListener('click', () => playSound('click'));
-  });
-  
+  // Инициализируем обработчики событий
   document.getElementById("inventory").onclick = () => openModal("inventory");
   document.getElementById("market").onclick = () => openModal("market");
   document.getElementById("mining").onclick = () => openModal("mining");
@@ -186,4 +195,9 @@ document.addEventListener("DOMContentLoaded", () => {
     Telegram.WebApp.expand();
     setTimeout(scaleGame, 200);
   }
+}
+
+// Запускаем загрузку ресурсов при загрузке DOM
+document.addEventListener("DOMContentLoaded", () => {
+  window.initLoader(initGame);
 });

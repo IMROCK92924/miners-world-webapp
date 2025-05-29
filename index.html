@@ -1,26 +1,23 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport"
       content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="description" content="MinningFarm - увлекательная игра о добыче ресурсов и развитии фермы" />
+  <meta name="description" content="MinningFarm - exciting resource mining and farm development game" />
   <meta name="theme-color" content="#000000" />
   <meta property="og:title" content="MinningFarm" />
-  <meta property="og:description" content="Добывайте ресурсы, развивайте свою ферму и станьте лучшим майнером!" />
+  <meta property="og:description" content="Mine resources, develop your farm and become the best miner!" />
   <meta property="og:type" content="website" />
   
   <title>MinningFarm</title>
-  
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
   
   <!-- Предзагрузка критических ресурсов -->
   <link rel="preload" href="assets/background.png" as="image" />
   <link rel="preload" href="assets/energy/energy_0.png" as="image" />
   
+  <!-- Стили -->
+  <link rel="stylesheet" href="loading.css" />
   <link rel="stylesheet" href="style.css" />
   <style>
     /* фикс для клавиатуры */
@@ -30,34 +27,63 @@
   </style>
 </head>
 <body>
-  <div class="wrapper">
+  <!-- Loading Screen -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="loading-background"></div>
+    <div class="loading-content">
+      <!-- Временно уберем логотип -->
+      <!-- <img src="assets/ui/logo.png" alt="MinningFarm" class="loading-logo"> -->
+      <div class="loading-text">Loading Game</div>
+      <div class="loading-bar-container">
+        <div class="loading-bar"></div>
+      </div>
+      <div class="loading-details" id="loading-details">Preparing resources...</div>
+      <div class="loading-categories">
+        <div class="loading-category" id="cat-interface">
+          <div class="loading-category-icon">🖥️</div>
+          <div class="loading-category-label">Interface</div>
+        </div>
+        <div class="loading-category" id="cat-graphics">
+          <div class="loading-category-icon">🎨</div>
+          <div class="loading-category-label">Graphics</div>
+        </div>
+        <div class="loading-category" id="cat-sounds">
+          <div class="loading-category-icon">🔊</div>
+          <div class="loading-category-label">Sounds</div>
+        </div>
+      </div>
+      <div id="loading-progress" class="loading-text">0%</div>
+    </div>
+  </div>
+
+  <div class="wrapper" style="display: none;">
     <div class="scale-box">
       <div class="game">
+        <!-- Resources -->
+        <div class="resource" id="irid">0</div>
+        <div class="resource" id="rubid">0</div>
+        <div class="resource" id="fel">0</div>
 
-        <!-- РЕСУРСЫ -->
-        <div class="resource" id="irid">1234567</div>
-        <div class="resource" id="rubid">1234567</div>
-        <div class="resource" id="fel">1234567</div>
-
-        <!-- МОДАЛКИ -->
+        <!-- Modals -->
         <div id="modal-container"></div>
 
-        <!-- ЭНЕРГИЯ -->
+        <!-- Energy -->
         <div class="energy-wrapper">
           <img id="energyBar" src="assets/energy/energy_0.png" alt="Energy bar">
           <img id="plusButton" src="assets/ui/plus.png" alt="+" class="energy-plus">
         </div>
 
-        <!-- КНОПКИ -->
+        <!-- Buttons -->
         <img src="assets/btn_market.png" class="btn" id="market" />
         <img src="assets/btn_home.png" class="btn" id="home" />
         <img src="assets/btn_inventory.png" class="btn" id="inventory" />
         <img src="assets/btn_mining.png" class="btn" id="mining" />
-
       </div>
     </div>
   </div>
 
+  <!-- Scripts -->
+  <script src="loading.js"></script>
   <script src="script.js" defer></script>
 </body>
 </html>
