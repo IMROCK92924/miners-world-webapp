@@ -83,14 +83,93 @@ function debounce(func, wait) {
   };
 }
 
+function formatTime(seconds) {
+  if (seconds < 0) return '00:00:00';
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+function canClaim(tool) {
+  if (!tool.lastHarvest) return true;
+  const now = Date.now();
+  const elapsed = Math.floor((now - tool.lastHarvest) / 1000);
+  return elapsed >= tool.harvestTime;
+}
+
+function claimRewards(toolId) {
+  const tool = gameState.tools.find(t => t.id === toolId);
+  if (!tool || !canClaim(tool)) return;
+
+  // Начисляем награды в зависимости от редкости
+  const rewards = {
+    common: { irid: 1, rubid: 1, fel: 1 },
+    uncommon: { irid: 2, rubid: 2, fel: 2 },
+    rare: { irid: 3, rubid: 3, fel: 3 },
+    epic: { irid: 5, rubid: 5, fel: 5 }
+  };
+
+  const reward = rewards[tool.rarity];
+  gameState.resources.irid += reward.irid;
+  gameState.resources.rubid += reward.rubid;
+  gameState.resources.fel += reward.fel;
+
+  // Обновляем время последнего сбора
+  tool.lastHarvest = Date.now();
+  
+  // Уменьшаем прочность
+  tool.durability.current = Math.max(0, tool.durability.current - 1);
+
+  // Обновляем UI
+  updateUI();
+  updateMiningTools();
+  
+  // Воспроизводим звук успеха
+  playSound('success');
+}
+
+function updateMiningTools() {
+  const tools = gameState.tools;
+  tools.forEach(tool => {
+    const toolElement = document.getElementById(`tool-${tool.id}`);
+    if (toolElement) {
+      const timeElement = toolElement.querySelector('.harvest-time');
+      const claimButton = toolElement.querySelector('.claim-button');
+      
+      if (timeElement && claimButton) {
+        if (tool.lastHarvest) {
+          const now = Date.now();
+          const elapsed = Math.floor((now - tool.lastHarvest) / 1000);
+          const remaining = Math.max(0, tool.harvestTime - elapsed);
+          
+          timeElement.textContent = `⏱ Time: ${formatTime(remaining)}`;
+          
+          if (canClaim(tool)) {
+            claimButton.disabled = false;
+            claimButton.textContent = 'CLAIM';
+          } else {
+            claimButton.disabled = true;
+            claimButton.textContent = 'WAIT';
+          }
+        } else {
+          timeElement.textContent = `⏱ Time: Ready!`;
+          claimButton.disabled = false;
+          claimButton.textContent = 'CLAIM';
+        }
+      }
+    }
+  });
+}
+
 function openModal(name) {
   playSound('click');
-  const modalContainer = document.getElementById("modal-container");
-  modalContainer.innerHTML = "";
-  const modal = document.createElement("div");
-  modal.className = `modal ${name}`;
-  
   if (name === "energy") {
+    const modalContainer = document.getElementById("modal-container");
+    modalContainer.innerHTML = "";
+    const modal = document.createElement("div");
+    modal.className = `modal ${name}`;
+    
     modal.innerHTML = `
       <input id="energyInput" class="energy-input" type="number" 
              min="${ENERGY_MIN}" max="${ENERGY_MAX}" 
@@ -101,17 +180,9 @@ function openModal(name) {
         <button id="energyCancel" class="cancel">CANCEL</button>
       </div>
     `;
-  } else {
-    modal.style.backgroundImage = `url('assets/modal_${name}.png')`;
-  }
-
-  modal.onclick = (e) => {
-    if (e.target === modal) modal.remove();
-  };
-  
-  modalContainer.appendChild(modal);
-  
-  if (name === "energy") {
+    
+    modalContainer.appendChild(modal);
+    
     const input = document.getElementById("energyInput");
     input.focus();
     
@@ -129,6 +200,15 @@ function openModal(name) {
     };
     
     document.getElementById("energyCancel").onclick = () => modal.remove();
+  } else if (name === "mining") {
+    miningModal.show();
+  } else {
+    const modalContainer = document.getElementById("modal-container");
+    modalContainer.innerHTML = "";
+    const modal = document.createElement("div");
+    modal.className = `modal ${name}`;
+    modal.style.backgroundImage = `url('assets/modal_${name}.png')`;
+    modalContainer.appendChild(modal);
   }
 }
 
@@ -177,7 +257,14 @@ function initGame(resourceCache) {
   // Инициализируем обработчики событий
   document.getElementById("inventory").onclick = () => openModal("inventory");
   document.getElementById("market").onclick = () => openModal("market");
-  document.getElementById("mining").onclick = () => openModal("mining");
+  document.getElementById("mining").onclick = () => {
+    playSound('click');
+    if (window.miningModal) {
+      window.miningModal.show();
+    } else {
+      console.error('MiningModal not initialized!');
+    }
+  };
   document.getElementById("home").onclick = () => {
     document.getElementById("modal-container").innerHTML = "";
   };
