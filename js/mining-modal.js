@@ -94,6 +94,21 @@ class MiningModal {
         const tool = this.tools.find(t => t.id === toolId);
         if (!tool || !this.canClaim(tool)) return;
 
+        // Находим кнопку CLAIM для этого инструмента
+        const toolElement = document.getElementById(`tool-${toolId}`);
+        const claimButton = toolElement.querySelector('.claim-button');
+
+        // Определяем тип ресурса на основе редкости
+        let resourceType = 'fel'; // По умолчанию
+        if (tool.rarity === 'epic') {
+            resourceType = 'irid';
+        } else if (tool.rarity === 'rare') {
+            resourceType = 'rubid';
+        }
+
+        // Создаем эффект переноса ресурсов
+        createResourceTransferEffect(claimButton, resourceType);
+
         // Начисляем награды в зависимости от редкости
         const rewards = {
             common: { irid: 1, rubid: 1, fel: 1 },
@@ -103,22 +118,26 @@ class MiningModal {
         };
 
         const reward = rewards[tool.rarity];
-        gameState.resources.irid += reward.irid;
-        gameState.resources.rubid += reward.rubid;
-        gameState.resources.fel += reward.fel;
-
-        // Обновляем время последнего сбора
-        tool.lastHarvest = Date.now();
         
-        // Уменьшаем прочность
-        tool.durability.current = Math.max(0, tool.durability.current - 1);
+        // Задержка обновления UI для анимации
+        setTimeout(() => {
+            gameState.resources.irid += reward.irid;
+            gameState.resources.rubid += reward.rubid;
+            gameState.resources.fel += reward.fel;
 
-        // Сохраняем состояние
-        this.saveState();
+            // Обновляем время последнего сбора
+            tool.lastHarvest = Date.now();
+            
+            // Уменьшаем прочность
+            tool.durability.current = Math.max(0, tool.durability.current - 1);
 
-        // Обновляем UI
-        updateUI();
-        this.updateMiningTools();
+            // Сохраняем состояние
+            this.saveState();
+
+            // Обновляем UI
+            updateUI();
+            this.updateMiningTools();
+        }, 800);
         
         // Воспроизводим звук успеха
         playSound('success');

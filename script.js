@@ -102,6 +102,21 @@ function claimRewards(toolId) {
   const tool = gameState.tools.find(t => t.id === toolId);
   if (!tool || !canClaim(tool)) return;
 
+  // Находим кнопку CLAIM для этого инструмента
+  const toolElement = document.getElementById(`tool-${toolId}`);
+  const claimButton = toolElement.querySelector('.claim-button');
+
+  // Определяем тип ресурса на основе редкости
+  let resourceType = 'fel'; // По умолчанию
+  if (tool.rarity === 'epic') {
+    resourceType = 'irid';
+  } else if (tool.rarity === 'rare') {
+    resourceType = 'rubid';
+  }
+
+  // Создаем эффект переноса ресурсов
+  createResourceTransferEffect(claimButton, resourceType);
+
   // Начисляем награды в зависимости от редкости
   const rewards = {
     common: { irid: 1, rubid: 1, fel: 1 },
@@ -121,9 +136,11 @@ function claimRewards(toolId) {
   // Уменьшаем прочность
   tool.durability.current = Math.max(0, tool.durability.current - 1);
 
-  // Обновляем UI
-  updateUI();
-  updateMiningTools();
+  // Обновляем UI с небольшой задержкой, чтобы анимация успела проиграться
+  setTimeout(() => {
+    updateUI();
+    updateMiningTools();
+  }, 800);
   
   // Воспроизводим звук успеха
   playSound('success');
@@ -289,7 +306,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initLoader(initGame);
 });
 
-function createResourceTransferEffect(button, resourceType) {
+// Глобальная функция для создания эффекта переноса ресурсов
+window.createResourceTransferEffect = function(button, resourceType) {
   const buttonRect = button.getBoundingClientRect();
   const resourceElement = document.getElementById(resourceType);
   const resourceRect = resourceElement.getBoundingClientRect();
@@ -328,16 +346,15 @@ function createResourceTransferEffect(button, resourceType) {
   }
 }
 
-// Добавляем обработчик для кнопок CLAIM
-document.addEventListener('DOMContentLoaded', () => {
+// Удаляем старый обработчик кнопок CLAIM, так как теперь эффект вызывается из claimRewards
+document.removeEventListener('DOMContentLoaded', () => {
   const claimButtons = document.querySelectorAll('.claim-button');
   claimButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
+    button.removeEventListener('click', (e) => {
       const miningTool = e.target.closest('.mining-tool');
       if (!miningTool) return;
       
-      // Определяем тип ресурса на основе класса карточки
-      let resourceType = 'fel'; // По умолчанию
+      let resourceType = 'fel';
       if (miningTool.classList.contains('rarity-epic')) {
         resourceType = 'irid';
       } else if (miningTool.classList.contains('rarity-rare')) {
