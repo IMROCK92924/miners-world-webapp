@@ -198,6 +198,6 @@ function initGame(resourceCache) {
 }
 
 // Запускаем загрузку ресурсов при загрузке DOM
-document.addEventListener("DOMContentLoaded", () => {
-  window.initLoader(initGame);
+document.addEventListener('DOMContentLoaded', () => {
+  initLoader(initGame);
 });

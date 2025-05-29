@@ -89,7 +89,6 @@ class ResourceLoader {
       console.log('Loading complete');
       document.getElementById('loading-details').textContent = 'Loading complete!';
       
-      // Check if minimum loading time has passed
       const elapsedTime = Date.now() - this.startTime;
       const remainingTime = Math.max(0, this.minLoadingTime - elapsedTime);
       
