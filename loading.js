@@ -36,6 +36,8 @@ class ResourceLoader {
       sounds: {}
     };
     this.onComplete = onComplete;
+    this.startTime = Date.now();
+    this.minLoadingTime = 3000; // Minimum loading time - 3 seconds
     console.log('Loader initialized. Total resources:', this.totalResources);
   }
 
@@ -86,11 +88,16 @@ class ResourceLoader {
     if (progress === 100) {
       console.log('Loading complete');
       document.getElementById('loading-details').textContent = 'Loading complete!';
+      
+      // Check if minimum loading time has passed
+      const elapsedTime = Date.now() - this.startTime;
+      const remainingTime = Math.max(0, this.minLoadingTime - elapsedTime);
+      
       setTimeout(() => {
         if (typeof this.onComplete === 'function') {
           this.onComplete(this.cache);
         }
-      }, 500);
+      }, remainingTime);
     }
     
     return progress === 100;
