@@ -2,10 +2,25 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
- <meta name="viewport"
+  <meta name="viewport"
       content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
- 
+  <meta name="description" content="MinningFarm - увлекательная игра о добыче ресурсов и развитии фермы" />
+  <meta name="theme-color" content="#000000" />
+  <meta property="og:title" content="MinningFarm" />
+  <meta property="og:description" content="Добывайте ресурсы, развивайте свою ферму и станьте лучшим майнером!" />
+  <meta property="og:type" content="website" />
+  
   <title>MinningFarm</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+  
+  <!-- Предзагрузка критических ресурсов -->
+  <link rel="preload" href="assets/background.png" as="image" />
+  <link rel="preload" href="assets/energy/energy_0.png" as="image" />
+  
   <link rel="stylesheet" href="style.css" />
   <style>
     /* фикс для клавиатуры */
@@ -43,6 +58,6 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
