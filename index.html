@@ -2,34 +2,47 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport"
-        content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+ <meta name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+ 
   <title>MinningFarm</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* фикс для клавиатуры */
+    html, body {
+      touch-action: manipulation;
+    }
+  </style>
 </head>
 <body>
   <div class="wrapper">
     <div class="scale-box">
       <div class="game">
+
         <!-- РЕСУРСЫ -->
         <div class="resource" id="irid">1234567</div>
         <div class="resource" id="rubid">1234567</div>
         <div class="resource" id="fel">1234567</div>
+
+        <!-- МОДАЛКИ -->
+        <div id="modal-container"></div>
+
         <!-- ЭНЕРГИЯ -->
         <div class="energy-wrapper">
           <img id="energyBar" src="assets/energy/energy_0.png" alt="Energy bar">
           <img id="plusButton" src="assets/ui/plus.png" alt="+" class="energy-plus">
         </div>
+
         <!-- КНОПКИ -->
         <img src="assets/btn_market.png" class="btn" id="market" />
         <img src="assets/btn_home.png" class="btn" id="home" />
         <img src="assets/btn_inventory.png" class="btn" id="inventory" />
         <img src="assets/btn_mining.png" class="btn" id="mining" />
+
       </div>
     </div>
-    <!-- МОДАЛКИ -->
-    <div id="modal-container"></div>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
