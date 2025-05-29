@@ -47,6 +47,7 @@ function scaleGame() {
   const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
   const actualWidth = window.innerWidth;
   const scale = actualWidth / designWidth; // Масштаб по ширине
+  const scaledHeight = designHeight * scale;
   const game = document.querySelector('.game');
   game.style.transform = `scale(${scale})`;
   game.style.transformOrigin = 'top left';
@@ -54,9 +55,11 @@ function scaleGame() {
   box.style.width = `${designWidth}px`;
   box.style.height = `${designHeight}px`;
   box.style.left = `0px`;
-  box.style.top = `${(viewportHeight - designHeight * scale) / 2}px`;
+  box.style.top = `${(viewportHeight - scaledHeight) / 2}px`;
   const wrapper = document.querySelector('.wrapper');
   wrapper.style.background = 'url("assets/background.png") no-repeat center/cover';
+  // Логи для отладки
+  console.log(`Width: ${actualWidth}, Height: ${viewportHeight}, Scale: ${scale}, ScaledHeight: ${scaledHeight}`);
 }
 
 function handleResize() {
