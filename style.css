@@ -1,3 +1,4 @@
+/* === Глобальные стили === */
 :root {
   height: 100%;
 }
@@ -6,57 +7,60 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background-color: black;
-  overflow: hidden;
+  background-color: black; /* Запасной черный фон */
+  overflow: hidden; /* Запрет прокрутки страницы */
   display: flex;
   justify-content: center;
   align-items: center;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-  position: fixed;
+  -webkit-user-select: none; /* Отключение выделения текста */
+  -webkit-touch-callout: none; /* Отключение контекстного меню */
+  position: fixed; /* Фиксация для защиты от сжатия клавиатурой */
   top: 0;
   left: 0;
-  touch-action: manipulation;
+  touch-action: manipulation; /* Улучшение сенсорного управления */
 }
 
+/* === Главный контейнер === */
 .wrapper {
-  height: 100vh;
-  max-height: 100svh;
-  width: 100vw;
-  overflow: hidden;
+  height: 100vh; /* Полная высота области просмотра */
+  max-height: 100svh; /* Поддержка современных браузеров (small viewport height) */
+  width: 100vw; /* Полная ширина */
+  overflow: hidden; /* Запрет прокрутки */
   position: relative;
-  background: url('assets/background.png') no-repeat center/cover;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background-color: #000; /* Однотонный черный фон */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); /* Учет вырезов и панелей */
   box-sizing: border-box;
 }
 
+/* === Масштабируемая игровая сцена === */
 .scale-box {
-  width: 720px;
-  height: 1480px;
+  width: 720px; /* Базовая ширина дизайна */
+  height: 1480px; /* Базовая высота дизайна */
   position: absolute;
   top: 0;
   left: 0;
-  transform-origin: top left;
-  overflow: visible;
+  transform-origin: top left; /* Точка масштабирования */
+  overflow: visible; /* Для прокрутки содержимого */
 }
 
 .game {
   width: 100%;
   height: 100%;
   position: relative;
-  background-image: url('assets/background.png');
-  background-size: cover;
+  background-image: url('assets/background.png'); /* Игровой фон */
+  background-size: cover; /* Заполнение с сохранением пропорций */
   background-position: center;
   background-repeat: no-repeat;
   font-family: Arial, sans-serif;
-  overflow: auto;
+  overflow: auto; /* Прокрутка, если контент не помещается */
 }
 
+/* === Элементы интерфейса === */
 .resource {
   position: absolute;
-  color: #00ffff;
+  color: #00ffff; /* Цвет текста ресурсов */
   font-size: 30px;
-  text-shadow: 0 0 5px #00ffff;
+  text-shadow: 0 0 5px #00ffff; /* Свечение */
   z-index: 3;
 }
 
@@ -70,7 +74,7 @@ html, body {
   width: 150px;
   cursor: pointer;
   z-index: 15;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease; /* Плавное масштабирование */
 }
 
 #home       { left: 51px; top: 1271px; }
@@ -79,10 +83,10 @@ html, body {
 #mining     { left: 206px; top: 1271px; }
 
 .btn:hover {
-  transform: scale(1.1);
+  transform: scale(1.1); /* Увеличение при наведении */
 }
 .btn:active {
-  transform: scale(0.95);
+  transform: scale(0.95); /* Уменьшение при нажатии */
 }
 
 .energy-wrapper {
@@ -97,7 +101,7 @@ html, body {
 .energy-wrapper img#energyBar {
   width: 100%;
   height: 100%;
-  image-rendering: pixelated;
+  image-rendering: pixelated; /* Четкость пиксельных изображений */
 }
 
 .energy-plus {
@@ -111,29 +115,30 @@ html, body {
   z-index: 9;
 }
 
+/* === Модальные окна === */
 #modal-container {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+  position: fixed; /* Фиксация относительно экрана */
+  width: 100vw;
+  height: 100vh;
   top: 0;
   left: 0;
   z-index: 10;
-  pointer-events: none;
+  pointer-events: none; /* Пропуск кликов, кроме модалок */
 }
 
 .modal {
   position: absolute;
-  top: 49%;
+  top: 50%;
   left: 50%;
-  width: 659px;
-  height: 1122px;
-  transform: translate(-50%, -50%) scale(0.7);
-  background-size: cover;
+  width: 600px; /* Уменьшенный размер для других модалок */
+  height: 1000px;
+  transform: translate(-50%, -50%);
+  background-size: contain; /* Адаптация изображения */
   background-position: center;
   background-repeat: no-repeat;
   z-index: 20;
   pointer-events: auto;
-  animation: popup 0.3s ease forwards;
+  animation: popup 0.3s ease forwards; /* Анимация появления */
 }
 
 @keyframes popup {
@@ -148,8 +153,8 @@ html, body {
 }
 
 .modal.energy {
-  width: 588px;
-  height: 351px;
+  width: 400px; /* Компактный размер для модалки энергии */
+  height: 250px;
   background-image: url("assets/modal_energy.png");
   background-size: contain;
   background-repeat: no-repeat;
@@ -163,14 +168,14 @@ html, body {
   top: 45%;
   left: 50%;
   transform: translateX(-50%);
-  width: 226px;
-  height: 31px;
-  font-size: 21px;
+  width: 180px;
+  height: 28px;
+  font-size: 18px;
   text-align: center;
   border: none;
   border-radius: 8px;
-  background-color: #000000cc;
-  color: #00ffcc;
+  background-color: #000000cc; /* Полупрозрачный черный */
+  color: #00ffcc; /* Цвет текста */
   z-index: 2;
 }
 
@@ -180,23 +185,23 @@ html, body {
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 20px;
+  gap: 15px;
   z-index: 2;
 }
 
 .modal-buttons button {
-  width: 145px;
-  height: 55px;
-  font-size: 26px;
+  width: 120px;
+  height: 45px;
+  font-size: 22px;
   border: none;
-  border-radius: 11px;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: bold;
-  background-color: #0f0;
+  background-color: #0f0; /* Зеленый для OK */
   color: #000;
 }
 
 .modal-buttons .cancel {
-  background-color: #444;
+  background-color: #444; /* Серый для Cancel */
   color: #fff;
 }
