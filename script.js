@@ -288,3 +288,63 @@ function initGame(resourceCache) {
 document.addEventListener('DOMContentLoaded', () => {
   initLoader(initGame);
 });
+
+function createResourceTransferEffect(button, resourceType) {
+  const buttonRect = button.getBoundingClientRect();
+  const resourceElement = document.getElementById(resourceType);
+  const resourceRect = resourceElement.getBoundingClientRect();
+
+  // Создаем несколько частиц
+  for (let i = 0; i < 5; i++) {
+    setTimeout(() => {
+      const particle = document.createElement('div');
+      particle.className = 'resource-particle';
+      
+      // Начальная позиция (кнопка CLAIM)
+      particle.style.left = `${buttonRect.left + buttonRect.width / 2}px`;
+      particle.style.top = `${buttonRect.top + buttonRect.height / 2}px`;
+      
+      // Рассчитываем расстояние для перемещения
+      const flyX = resourceRect.left - buttonRect.left;
+      const flyY = resourceRect.top - buttonRect.top;
+      
+      // Устанавливаем CSS переменные для анимации
+      particle.style.setProperty('--fly-x', `${flyX}px`);
+      particle.style.setProperty('--fly-y', `${flyY}px`);
+      
+      document.body.appendChild(particle);
+      
+      // Удаляем частицу после завершения анимации
+      particle.addEventListener('animationend', () => {
+        particle.remove();
+        if (i === 4) { // Последняя частица
+          resourceElement.classList.add('highlight');
+          setTimeout(() => {
+            resourceElement.classList.remove('highlight');
+          }, 500);
+        }
+      });
+    }, i * 100); // Задержка между частицами
+  }
+}
+
+// Добавляем обработчик для кнопок CLAIM
+document.addEventListener('DOMContentLoaded', () => {
+  const claimButtons = document.querySelectorAll('.claim-button');
+  claimButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+      const miningTool = e.target.closest('.mining-tool');
+      if (!miningTool) return;
+      
+      // Определяем тип ресурса на основе класса карточки
+      let resourceType = 'fel'; // По умолчанию
+      if (miningTool.classList.contains('rarity-epic')) {
+        resourceType = 'irid';
+      } else if (miningTool.classList.contains('rarity-rare')) {
+        resourceType = 'rubid';
+      }
+      
+      createResourceTransferEffect(button, resourceType);
+    });
+  });
+});

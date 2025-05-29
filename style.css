@@ -354,7 +354,10 @@ html, body {
 /* Common - серый */
 .rarity-common {
   background: rgba(100, 100, 100, 0.4);
+  --glow-color: rgba(150, 150, 150, 0.7);
+  --glow-color-bg: rgba(150, 150, 150, 0.3);
 }
+
 .rarity-common:hover {
   background: rgba(100, 100, 100, 0.5);
 }
@@ -362,7 +365,10 @@ html, body {
 /* Uncommon - зеленый */
 .rarity-uncommon {
   background: rgba(0, 255, 0, 0.2);
+  --glow-color: rgba(0, 255, 0, 0.7);
+  --glow-color-bg: rgba(0, 255, 0, 0.3);
 }
+
 .rarity-uncommon:hover {
   background: rgba(0, 255, 0, 0.3);
 }
@@ -377,6 +383,18 @@ html, body {
   border: 2px solid rgba(255, 165, 0, 0.5);
   box-shadow: 0 0 15px rgba(255, 165, 0, 0.3),
               inset 0 0 20px rgba(255, 165, 0, 0.1);
+  --glow-color: rgba(255, 165, 0, 0.7);
+  --glow-color-bg: rgba(255, 165, 0, 0.3);
+}
+
+.rarity-rare:hover {
+  background: linear-gradient(to bottom,
+    rgba(0, 0, 0, 0.6),
+    rgba(255, 165, 0, 0.25) 50%,
+    rgba(0, 0, 0, 0.6)
+  );
+  border-color: rgba(255, 165, 0, 0.8);
+  box-shadow: 0 0 15px rgba(255, 165, 0, 0.3);
 }
 
 /* Epic - фиолетовый */
@@ -389,12 +407,27 @@ html, body {
   border: 2px solid rgba(163, 53, 238, 0.5);
   box-shadow: 0 0 15px rgba(163, 53, 238, 0.3),
               inset 0 0 20px rgba(163, 53, 238, 0.1);
+  --glow-color: rgba(163, 53, 238, 0.7);
+  --glow-color-bg: rgba(163, 53, 238, 0.3);
+}
+
+.rarity-epic:hover {
+  background: linear-gradient(to bottom,
+    rgba(0, 0, 0, 0.6),
+    rgba(163, 53, 238, 0.25) 50%,
+    rgba(0, 0, 0, 0.6)
+  );
+  border-color: rgba(163, 53, 238, 0.8);
+  box-shadow: 0 0 15px rgba(163, 53, 238, 0.3);
 }
 
 /* Legendary - красный */
 .rarity-legendary {
   background: rgba(255, 0, 0, 0.3);
+  --glow-color: rgba(255, 0, 0, 0.7);
+  --glow-color-bg: rgba(255, 0, 0, 0.3);
 }
+
 .rarity-legendary:hover {
   background: rgba(255, 0, 0, 0.4);
 }
@@ -425,7 +458,6 @@ html, body {
   object-fit: contain;
 }
 
-/* Стили для разных редкостей */
 .tool-image::before {
   content: '';
   position: absolute;
@@ -438,66 +470,9 @@ html, body {
   transition: all 0.3s ease;
 }
 
-/* Common - серый */
-.rarity-common .tool-image::before {
-  box-shadow: 0 0 20px 5px rgba(150, 150, 150, 0.5);
-  background: radial-gradient(circle at center, rgba(150, 150, 150, 0.2), transparent 70%);
-}
-
-/* Uncommon - зеленый */
-.rarity-uncommon .tool-image::before {
-  box-shadow: 0 0 20px 5px rgba(0, 255, 0, 0.5);
-  background: radial-gradient(circle at center, rgba(0, 255, 0, 0.2), transparent 70%);
-}
-
-/* Rare - синий */
-.rarity-rare .tool-image::before {
-  box-shadow: 0 0 20px 5px rgba(0, 150, 255, 0.5);
-  background: radial-gradient(circle at center, rgba(0, 150, 255, 0.2), transparent 70%);
-}
-
-/* Epic - фиолетовый */
-.rarity-epic .tool-image::before {
-  box-shadow: 0 0 20px 5px rgba(163, 53, 238, 0.5);
-  background: radial-gradient(circle at center, rgba(163, 53, 238, 0.2), transparent 70%);
-}
-
-/* Legendary - оранжевый */
-.rarity-legendary .tool-image::before {
-  box-shadow: 0 0 20px 5px rgba(255, 165, 0, 0.5);
-  background: radial-gradient(circle at center, rgba(255, 165, 0, 0.2), transparent 70%);
-}
-
-/* Усиление эффекта при наведении */
 .mining-tool:hover .tool-image::before {
   box-shadow: 0 0 30px 10px var(--glow-color);
   background: radial-gradient(circle at center, var(--glow-color-bg), transparent 80%);
-}
-
-/* Цвета для hover эффекта */
-.rarity-common {
-  --glow-color: rgba(150, 150, 150, 0.7);
-  --glow-color-bg: rgba(150, 150, 150, 0.3);
-}
-
-.rarity-uncommon {
-  --glow-color: rgba(0, 255, 0, 0.7);
-  --glow-color-bg: rgba(0, 255, 0, 0.3);
-}
-
-.rarity-rare {
-  --glow-color: rgba(0, 150, 255, 0.7);
-  --glow-color-bg: rgba(0, 150, 255, 0.3);
-}
-
-.rarity-epic {
-  --glow-color: rgba(163, 53, 238, 0.7);
-  --glow-color-bg: rgba(163, 53, 238, 0.3);
-}
-
-.rarity-legendary {
-  --glow-color: rgba(255, 165, 0, 0.7);
-  --glow-color-bg: rgba(255, 165, 0, 0.3);
 }
 
 .tool-info {
@@ -510,11 +485,11 @@ html, body {
 }
 
 .tool-name {
-  font-size: 36px;
+  font-size: 29px !important;
   color: #00ffff;
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
   line-height: 1.1;
-  margin-bottom: 10px;
+  margin-bottom: 2px !important;
 }
 
 .harvest-time, .tool-durability {
@@ -542,15 +517,16 @@ html, body {
   border: none;
   border-radius: 4px;
   padding: 5px 15px;
-  font-size: 18px;
-  height: 30px;
+  font-size: 21px;
+  height: 35px;
   color: #00ffe8;
   font-weight: lighter;
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
-  min-width: 120px;
+  min-width: 140px;
   letter-spacing: 1px;
+  overflow: hidden;
 }
 
 .claim-button:hover {
@@ -565,6 +541,25 @@ html, body {
   box-shadow: none;
 }
 
+.claim-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.claim-button:active::after {
+  transform: translate(-50%, -50%) scale(20);
+  opacity: 0.2;
+}
+
 .modal.mining {
   width: 820px;
   height: 1122px;
@@ -575,23 +570,50 @@ html, body {
   position: relative;
 }
 
-/* Добавляем неоновое свечение при наведении */
-.rarity-epic:hover {
-  background: linear-gradient(to bottom,
-    rgba(0, 0, 0, 0.6),
-    rgba(163, 53, 238, 0.25) 50%,
-    rgba(0, 0, 0, 0.6)
-  );
-  border-color: rgba(163, 53, 238, 0.8);
-  box-shadow: 0 0 15px rgba(163, 53, 238, 0.3);
+/* Анимация переноса ресурсов */
+@keyframes flyToResource {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  75% {
+    transform: translate(var(--fly-x), var(--fly-y)) scale(0.5);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(var(--fly-x), var(--fly-y)) scale(0);
+    opacity: 0;
+  }
 }
 
-.rarity-rare:hover {
-  background: linear-gradient(to bottom,
-    rgba(0, 0, 0, 0.6),
-    rgba(255, 165, 0, 0.25) 50%,
-    rgba(0, 0, 0, 0.6)
-  );
-  border-color: rgba(255, 165, 0, 0.8);
-  box-shadow: 0 0 15px rgba(255, 165, 0, 0.3);
+.resource-particle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle, var(--primary-color) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 100;
+  animation: flyToResource 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  box-shadow: 0 0 10px var(--primary-color);
+}
+
+.resource.highlight {
+  animation: resourceHighlight 0.5s ease-out;
+  transform: scale(1.2);
+}
+
+@keyframes resourceHighlight {
+  0% {
+    transform: scale(1);
+    text-shadow: 0 0 5px var(--primary-color);
+  }
+  50% {
+    transform: scale(1.2);
+    text-shadow: 0 0 15px var(--primary-color);
+  }
+  100% {
+    transform: scale(1);
+    text-shadow: 0 0 5px var(--primary-color);
+  }
 }
