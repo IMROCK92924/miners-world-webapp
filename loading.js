@@ -1,13 +1,13 @@
 console.log('loading.js: Starting initialization');
 
-// Категории ресурсов
+// Resource categories
 const RESOURCE_CATEGORIES = {
   interface: ['btn_', 'modal_'],
   graphics: ['background', 'energy_'],
   sounds: ['.mp3', '.wav']
 };
 
-// Ресурсы для предзагрузки
+// Resources to preload
 const RESOURCES = {
   images: [
     'assets/background.png',
@@ -25,7 +25,7 @@ const RESOURCES = {
   sounds: []
 };
 
-// Загрузчик ресурсов
+// Resource loader
 class ResourceLoader {
   constructor(onComplete) {
     this.totalResources = RESOURCES.images.length + RESOURCES.sounds.length;
@@ -36,7 +36,7 @@ class ResourceLoader {
       sounds: {}
     };
     this.onComplete = onComplete;
-    console.log('Инициализация загрузчика. Всего ресурсов:', this.totalResources);
+    console.log('Loader initialized. Total resources:', this.totalResources);
   }
 
   getResourceCategory(src) {
@@ -45,19 +45,19 @@ class ResourceLoader {
         return category;
       }
     }
-    return 'graphics'; // По умолчанию
+    return 'graphics'; // Default
   }
 
   updateLoadingDetails(src) {
     const details = document.getElementById('loading-details');
     if (details) {
       const fileName = src.split('/').pop();
-      details.textContent = `Загрузка: ${fileName}`;
+      details.textContent = `Loading: ${fileName}`;
     }
 
     const category = this.getResourceCategory(src);
     if (category !== this.currentCategory) {
-      // Обновляем активную категорию
+      // Update active category
       document.querySelectorAll('.loading-category').forEach(el => {
         el.classList.remove('active');
       });
@@ -71,7 +71,7 @@ class ResourceLoader {
 
   updateProgress() {
     const progress = Math.round((this.loadedResources / this.totalResources) * 100);
-    console.log('Прогресс загрузки:', progress + '%');
+    console.log('Loading progress:', progress + '%');
     
     const progressElement = document.getElementById('loading-progress');
     const barElement = document.querySelector('.loading-bar');
@@ -80,12 +80,12 @@ class ResourceLoader {
       progressElement.textContent = `${progress}%`;
       barElement.style.width = `${progress}%`;
     } else {
-      console.error('Не найдены элементы прогресса загрузки');
+      console.error('Progress elements not found');
     }
     
     if (progress === 100) {
-      console.log('Загрузка завершена');
-      document.getElementById('loading-details').textContent = 'Загрузка завершена!';
+      console.log('Loading complete');
+      document.getElementById('loading-details').textContent = 'Loading complete!';
       setTimeout(() => {
         if (typeof this.onComplete === 'function') {
           this.onComplete(this.cache);
@@ -97,19 +97,19 @@ class ResourceLoader {
   }
 
   loadImage(src) {
-    console.log('Загрузка изображения:', src);
+    console.log('Loading image:', src);
     this.updateLoadingDetails(src);
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        console.log('Изображение загружено:', src);
+        console.log('Image loaded:', src);
         this.cache.images[src] = img;
         this.loadedResources++;
         this.updateProgress();
         resolve(img);
       };
       img.onerror = (error) => {
-        console.error('Ошибка загрузки изображения:', src, error);
+        console.error('Error loading image:', src, error);
         this.loadedResources++;
         this.updateProgress();
         reject(error);
@@ -119,19 +119,19 @@ class ResourceLoader {
   }
 
   loadSound(src) {
-    console.log('Загрузка звука:', src);
+    console.log('Loading sound:', src);
     this.updateLoadingDetails(src);
     return new Promise((resolve, reject) => {
       const audio = new Audio();
       audio.oncanplaythrough = () => {
-        console.log('Звук загружен:', src);
+        console.log('Sound loaded:', src);
         this.cache.sounds[src] = audio;
         this.loadedResources++;
         this.updateProgress();
         resolve(audio);
       };
       audio.onerror = (error) => {
-        console.error('Ошибка загрузки звука:', src, error);
+        console.error('Error loading sound:', src, error);
         this.loadedResources++;
         this.updateProgress();
         reject(error);
@@ -141,19 +141,19 @@ class ResourceLoader {
   }
 
   async loadAll() {
-    console.log('Начало загрузки всех ресурсов');
-    document.getElementById('loading-details').textContent = 'Подготовка ресурсов...';
+    console.log('Starting to load all resources');
+    document.getElementById('loading-details').textContent = 'Preparing resources...';
     
     try {
       const imagePromises = RESOURCES.images.map(src => 
         this.loadImage(src).catch(error => {
-          console.error('Ошибка загрузки ресурса:', src, error);
+          console.error('Resource loading error:', src, error);
           return null;
         })
       );
       const soundPromises = RESOURCES.sounds.map(src => 
         this.loadSound(src).catch(error => {
-          console.error('Ошибка загрузки ресурса:', src, error);
+          console.error('Resource loading error:', src, error);
           return null;
         })
       );
@@ -162,28 +162,28 @@ class ResourceLoader {
       const failedResources = results.filter(r => r === null).length;
       
       if (failedResources > 0) {
-        console.warn(`Загрузка завершена с ${failedResources} ошибками`);
+        console.warn(`Loading completed with ${failedResources} errors`);
       } else {
-        console.log('Все ресурсы успешно загружены');
+        console.log('All resources loaded successfully');
       }
       
       return true;
     } catch (error) {
-      console.error('Критическая ошибка загрузки:', error);
+      console.error('Critical loading error:', error);
       return false;
     }
   }
 }
 
-// Функция инициализации загрузчика
+// Loader initialization function
 function initLoader(onComplete) {
-  console.log('Инициализация загрузчика ресурсов');
+  console.log('Initializing resource loader');
   const loader = new ResourceLoader(onComplete);
   loader.loadAll().catch(error => {
-    console.error('Ошибка инициализации загрузчика:', error);
-    alert('Ошибка загрузки ресурсов. Пожалуйста, обновите страницу.');
+    console.error('Loader initialization error:', error);
+    alert('Resource loading error. Please refresh the page.');
   });
 }
 
-// Экспортируем функцию для использования в основном скрипте
+// Export function for use in main script
 window.initLoader = initLoader; 
