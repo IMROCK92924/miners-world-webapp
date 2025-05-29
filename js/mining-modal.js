@@ -5,14 +5,14 @@ class MiningModal {
             cardHeight: 180,          // Увеличиваем высоту карточки
             cardPadding: 20,          // Увеличиваем отступы
             cardGap: 20,              // Увеличиваем расстояние между карточками
-            imageWidth: 120,          // Увеличиваем ширину изображения
-            imageHeight: 160,         // Увеличиваем высоту изображения (3:4)
+            imageWidth: 160,          // Увеличиваем ширину изображения
+            imageHeight: 180,         // Увеличиваем высоту изображения
             fontSize: {
-                name: 32,             // Увеличиваем размер названия
-                info: 24,             // Увеличиваем размер информации
-                button: 26            // Увеличиваем размер кнопки
+                name: 30,             // Увеличиваем размер названия
+                info: 15,             // Увеличиваем размер информации
+                button: 18            // Уменьшаем размер кнопки
             },
-            buttonPadding: '12px 30px' // Увеличиваем отступы кнопки
+            buttonPadding: '8px 10px' // Уменьшаем отступы кнопки
         };
 
         // Загружаем сохраненные инструменты или используем дефолтные
@@ -162,6 +162,8 @@ class MiningModal {
                 min-height: ${this.settings.cardHeight}px !important;
                 padding: ${this.settings.cardPadding}px !important;
                 margin-bottom: 5px !important;
+                border: none !important;
+                background: rgba(0, 0, 0, 0.4) !important;
             }
             .mining-tools {
                 gap: ${this.settings.cardGap}px !important;
@@ -170,28 +172,35 @@ class MiningModal {
             .tool-image {
                 width: ${this.settings.imageWidth}px !important;
                 height: ${this.settings.imageHeight}px !important;
+                border: none !important;
+                background: rgba(0, 0, 0, 0.2) !important;
             }
             .tool-name {
                 font-size: ${this.settings.fontSize.name}px !important;
-                margin-bottom: 10px !important;
+                margin-bottom: 5px !important;
             }
             .harvest-time, .tool-durability {
                 font-size: ${this.settings.fontSize.info}px !important;
-                margin-bottom: 8px !important;
+                line-height: 1.2 !important;
             }
             .claim-button {
                 font-size: ${this.settings.fontSize.button}px !important;
                 padding: ${this.settings.buttonPadding} !important;
-                min-width: 160px !important;
+                min-width: 140px !important;
+                height: 45px !important;
+                margin-top: 10px !important;
             }
             .tool-info {
-                padding-right: 180px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 8px !important;
             }
         `;
         document.head.appendChild(style);
 
         const toolsHTML = this.tools.map(tool => `
-            <div class="mining-tool" id="tool-${tool.id}">
+            <div class="mining-tool rarity-${tool.rarity}" id="tool-${tool.id}">
                 <div class="tool-header">
                     <div class="tool-image">
                         <img src="${tool.image}" alt="${tool.name}">
