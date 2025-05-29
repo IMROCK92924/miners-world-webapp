@@ -1,12 +1,27 @@
 class MiningModal {
     constructor() {
+        // Настройки отображения
+        this.settings = {
+            cardHeight: 180,          // Увеличиваем высоту карточки
+            cardPadding: 20,          // Увеличиваем отступы
+            cardGap: 20,              // Увеличиваем расстояние между карточками
+            imageWidth: 120,          // Увеличиваем ширину изображения
+            imageHeight: 160,         // Увеличиваем высоту изображения (3:4)
+            fontSize: {
+                name: 32,             // Увеличиваем размер названия
+                info: 24,             // Увеличиваем размер информации
+                button: 26            // Увеличиваем размер кнопки
+            },
+            buttonPadding: '12px 30px' // Увеличиваем отступы кнопки
+        };
+
         // Загружаем сохраненные инструменты или используем дефолтные
         const savedTools = localStorage.getItem('miningTools');
         this.tools = savedTools ? JSON.parse(savedTools) : [
             {
                 id: 'mfactory',
                 name: 'Mining Factory',
-                image: 'assets/NFT/Mfactory.png',
+                image: 'assets/NFT/11.png',
                 rarity: 'epic',
                 durability: {
                     current: 100,
@@ -18,7 +33,7 @@ class MiningModal {
             {
                 id: 'therobot',
                 name: 'Mining Robot',
-                image: 'assets/NFT/TheRobot.png',
+                image: 'assets/NFT/10.png',
                 rarity: 'rare',
                 durability: {
                     current: 85,
@@ -28,15 +43,27 @@ class MiningModal {
                 lastHarvest: null
             },
             {
-                id: 'mstation',
-                name: 'Mining Station',
-                image: 'assets/NFT/Mstation.png',
+                id: 'drill',
+                name: 'Mining Drill',
+                image: 'assets/NFT/9.png',
                 rarity: 'epic',
                 durability: {
                     current: 95,
                     max: 190
                 },
                 harvestTime: 150, // 2.5 минуты для теста
+                lastHarvest: null
+            },
+            {
+                id: 'collector',
+                name: 'Resource Collector',
+                image: 'assets/NFT/8.png',
+                rarity: 'rare',
+                durability: {
+                    current: 80,
+                    max: 160
+                },
+                harvestTime: 100, // 1.67 минуты для теста
                 lastHarvest: null
             }
         ];
@@ -128,6 +155,41 @@ class MiningModal {
         const modal = document.createElement("div");
         modal.className = "modal mining";
 
+        // Применяем настройки размеров к стилям
+        const style = document.createElement('style');
+        style.textContent = `
+            .mining-tool {
+                min-height: ${this.settings.cardHeight}px !important;
+                padding: ${this.settings.cardPadding}px !important;
+                margin-bottom: 5px !important;
+            }
+            .mining-tools {
+                gap: ${this.settings.cardGap}px !important;
+                padding: 10px 20px !important;
+            }
+            .tool-image {
+                width: ${this.settings.imageWidth}px !important;
+                height: ${this.settings.imageHeight}px !important;
+            }
+            .tool-name {
+                font-size: ${this.settings.fontSize.name}px !important;
+                margin-bottom: 10px !important;
+            }
+            .harvest-time, .tool-durability {
+                font-size: ${this.settings.fontSize.info}px !important;
+                margin-bottom: 8px !important;
+            }
+            .claim-button {
+                font-size: ${this.settings.fontSize.button}px !important;
+                padding: ${this.settings.buttonPadding} !important;
+                min-width: 160px !important;
+            }
+            .tool-info {
+                padding-right: 180px !important;
+            }
+        `;
+        document.head.appendChild(style);
+
         const toolsHTML = this.tools.map(tool => `
             <div class="mining-tool" id="tool-${tool.id}">
                 <div class="tool-header">
@@ -138,7 +200,7 @@ class MiningModal {
                         <div class="tool-name">${tool.name}</div>
                         <div class="harvest-time">⏱ ${tool.lastHarvest ? this.formatTime(tool.harvestTime) : 'Ready!'}</div>
                         <div class="tool-durability">🛠 ${tool.durability.current}/${tool.durability.max}</div>
-                        <button class="claim-button" onclick="miningModal.claimRewards('${tool.id}')" ${!this.canClaim(tool) ? 'disabled' : ''}>
+                        <button class="claim-button" onclick="window.miningModal.claimRewards('${tool.id}')" ${!this.canClaim(tool) ? 'disabled' : ''}>
                             CLAIM
                         </button>
                     </div>
@@ -159,9 +221,8 @@ class MiningModal {
         // Запускаем обновление времени
         this.updateInterval = setInterval(() => this.updateMiningTools(), 1000);
 
-        // Добавляем обработчик закрытия на modalContainer
+        // Добавляем обработчик закрытия
         modalContainer.onclick = (e) => {
-            // Проверяем, что клик был на modalContainer, а не на его дочерних элементах
             if (e.target === modalContainer) {
                 this.close();
             }

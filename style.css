@@ -308,11 +308,11 @@ html, body {
 
 .mining-container {
   position: absolute;
-  top: 345px;
-  left: 50%;
+  top: 340px;
+  left: 51%;
   transform: translateX(-50%);
-  width: 85%;
-  max-width: 500px;
+  width: 100%;
+  max-width: 540px;
   height: 600px;
   padding: 10px;
   box-sizing: border-box;
@@ -330,40 +330,42 @@ html, body {
 .mining-tools {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
   overflow-y: auto;
   height: 100%;
-  padding-right: 10px;
+  padding: 10px 20px;
 }
 
 .mining-tool {
   background: rgba(0, 0, 0, 0.3);
   border: 2px solid var(--primary-color);
-  border-radius: 10px;
-  padding: 15px;
+  border-radius: 4px;
+  padding: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
-  min-height: 100px;
+  min-height: 180px;
   display: flex;
   align-items: center;
+  margin-bottom: 5px;
 }
 
 .mining-tool:hover {
   background: rgba(0, 255, 255, 0.1);
   transform: scale(1.02);
+  border-color: var(--accent-color);
 }
 
 .tool-header {
   display: flex;
-  gap: 15px;
+  gap: 20px;
   align-items: center;
   width: 100%;
 }
 
 .tool-image {
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 160px;
   background: rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
@@ -384,20 +386,23 @@ html, body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   position: relative;
+  padding-right: 180px;
 }
 
 .tool-name {
-  font-size: 24px;
+  font-size: 32px;
   color: var(--primary-color);
   text-shadow: 0 0 5px var(--primary-color);
+  margin-bottom: 10px;
 }
 
 .harvest-time, .tool-durability {
-  font-size: 16px;
+  font-size: 24px;
   color: var(--accent-color);
   text-shadow: 0 0 3px var(--accent-color);
+  margin-bottom: 8px;
 }
 
 .tool-rarity {
@@ -413,13 +418,13 @@ html, body {
 
 .claim-button {
   position: absolute;
-  right: 10px;
-  bottom: 10px;
+  right: 0;
+  bottom: 0;
   background: #00ff00;
   border: none;
   border-radius: 5px;
-  padding: 8px 20px;
-  font-size: 16px;
+  padding: 12px 30px;
+  font-size: 26px;
   color: #000;
   font-weight: bold;
   cursor: pointer;
@@ -427,15 +432,18 @@ html, body {
   text-transform: uppercase;
   text-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
   box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+  min-width: 160px;
 }
 
 .claim-button:hover {
   transform: scale(1.1);
   box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
+  background: #00ff55;
 }
 
 .claim-button:active {
   transform: scale(0.95);
+  background: #00cc00;
 }
 
 .claim-button:disabled {
@@ -446,7 +454,7 @@ html, body {
 }
 
 .modal.mining {
-  width: 659px;
+  width: 820px;
   height: 1122px;
   background-image: url("assets/modal_mining.png");
   background-size: contain;
