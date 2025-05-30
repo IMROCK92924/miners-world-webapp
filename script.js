@@ -217,8 +217,8 @@ function openModal(name) {
     };
     
     document.getElementById("energyCancel").onclick = () => modal.remove();
-  } else if (name === "mining") {
-    miningModal.show();
+  } else if (name === "inventory") {
+    window.inventoryManager.show();
   } else {
     const modalContainer = document.getElementById("modal-container");
     modalContainer.innerHTML = "";
