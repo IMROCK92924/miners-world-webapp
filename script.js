@@ -343,8 +343,7 @@ function openModal(name) {
                 <div class="settings-section-title">
                     <i>👤</i> ${getText('nickname')}
                 </div>
-                <input type="text" class="nickname-input" value="${window.tonConnector?.userProfile?.nickname || ''}" 
-                       placeholder="Enter nickname" ${!window.tonConnector?.isConnected ? 'disabled' : ''}>
+                <div class="nickname-display">${window.tonConnector?.userProfile?.nickname || 'Anonymous'}</div>
             </div>
             
             <div class="settings-section">
@@ -479,6 +478,15 @@ const handleResize = debounce(() => {
   scaleGame();
 }, 250);
 
+// Добавляем функцию проверки подключения кошелька
+function checkWalletConnection() {
+    if (!window.tonConnector || !window.tonConnector.isConnected) {
+        openModal('settings');
+        return false;
+    }
+    return true;
+}
+
 // Обновляем инициализацию игры
 async function initGame() {
     console.log('Initializing game...');
@@ -493,18 +501,28 @@ async function initGame() {
         // Создаем экземпляр UserManager
         window.userManager = new UserManager();
         
-        // Инициализируем обработчики событий
+        // Инициализируем обработчики событий с проверкой подключения кошелька
         document.getElementById("inventory").onclick = () => {
-            if (window.inventoryManager) {
-                window.inventoryManager.show(true); // Показываем все NFT
+            if (checkWalletConnection() && window.inventoryManager) {
+                window.inventoryManager.show(true);
             }
         };
-        document.getElementById("market").onclick = () => openModal("market");
+        document.getElementById("market").onclick = () => {
+            if (checkWalletConnection()) {
+                openModal("market");
+            }
+        };
         document.getElementById("mining").onclick = () => openModal("settings");
         document.getElementById("home").onclick = () => {
-            document.getElementById("modal-container").innerHTML = "";
+            if (checkWalletConnection()) {
+                document.getElementById("modal-container").innerHTML = "";
+            }
         };
-        document.getElementById("plusButton").onclick = () => openModal("energy");
+        document.getElementById("plusButton").onclick = () => {
+            if (checkWalletConnection()) {
+                openModal("energy");
+            }
+        };
 
         // Настраиваем масштабирование
         scaleGame();
@@ -512,6 +530,11 @@ async function initGame() {
             window.visualViewport.addEventListener("resize", scaleGame);
         }
         window.addEventListener("resize", handleResize);
+        
+        // Проверяем подключение кошелька при старте
+        if (!window.tonConnector || !window.tonConnector.isConnected) {
+            openModal('settings');
+        }
         
         // Инициализируем загрузчик ресурсов
         initLoader(onResourcesLoaded);
