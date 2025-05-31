@@ -258,53 +258,87 @@ const handleResize = debounce(() => {
 }, 250);
 
 // Инициализация игры
-function initGame(resourceCache) {
-  // Инициализируем звуки
-  sounds.click = resourceCache.sounds['assets/sounds/click.mp3'];
-  sounds.success = resourceCache.sounds['assets/sounds/success.mp3'];
-  sounds.error = resourceCache.sounds['assets/sounds/error.mp3'];
+async function initGame() {
+    console.log('Initializing game...');
+    
+    try {
+        // Создаем экземпляр UserManager
+        window.userManager = new UserManager();
+        
+        // TODO: Здесь будет реальная авторизация
+        const userId = localStorage.getItem('userId') || 'test-user';
+        
+        // Авторизуем пользователя
+        const loginSuccess = await window.userManager.login(userId);
+        if (!loginSuccess) {
+            throw new Error('Login failed');
+        }
 
-  // Скрываем экран загрузки и показываем игру
-  document.getElementById('loading-screen').style.display = 'none';
-  document.querySelector('.wrapper').style.display = 'block';
+        // Загружаем сохраненное состояние
+        loadGameState();
+        
+        // Инициализируем обработчики событий
+        document.getElementById("inventory").onclick = () => openModal("inventory");
+        document.getElementById("market").onclick = () => openModal("market");
+        document.getElementById("mining").onclick = () => {
+            playSound('click');
+            if (window.miningModal) {
+                window.miningModal.show();
+            }
+        };
+        document.getElementById("home").onclick = () => {
+            document.getElementById("modal-container").innerHTML = "";
+        };
+        document.getElementById("plusButton").onclick = () => openModal("energy");
 
-  // Загружаем сохраненное состояние
-  loadGameState();
-  
-  // Инициализируем обработчики событий
-  document.getElementById("inventory").onclick = () => openModal("inventory");
-  document.getElementById("market").onclick = () => openModal("market");
-  document.getElementById("mining").onclick = () => {
-    playSound('click');
-    if (window.miningModal) {
-      window.miningModal.show();
-    } else {
-      console.error('MiningModal not initialized!');
+        // Настраиваем масштабирование
+        scaleGame();
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener("resize", scaleGame);
+        }
+        window.addEventListener("resize", handleResize);
+        
+        // Инициализируем загрузчик ресурсов
+        initLoader(onResourcesLoaded);
+        
+    } catch (error) {
+        console.error('Game initialization error:', error);
+        alert('Failed to initialize game. Please refresh the page.');
     }
-  };
-  document.getElementById("home").onclick = () => {
-    document.getElementById("modal-container").innerHTML = "";
-  };
-  document.getElementById("plusButton").onclick = () => openModal("energy");
-  
-  // Настраиваем масштабирование
-  scaleGame();
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", scaleGame);
-  }
-  window.addEventListener("resize", handleResize);
-  
-  // Интеграция с Telegram WebApp
-  if (window.Telegram?.WebApp?.expand) {
-    Telegram.WebApp.expand();
-    setTimeout(scaleGame, 200);
-  }
 }
 
-// Запускаем загрузку ресурсов при загрузке DOM
-document.addEventListener('DOMContentLoaded', () => {
-  initLoader(initGame);
-});
+// Callback после загрузки ресурсов
+function onResourcesLoaded(cache) {
+    console.log('Resources loaded, starting game...');
+    
+    // Скрываем экран загрузки
+    document.getElementById('loading-screen').style.display = 'none';
+    document.querySelector('.wrapper').style.display = 'block';
+    
+    // Инициализируем менеджеры
+    window.toolSlotManager = new ToolSlotManager();
+    window.inventoryManager = new InventoryManager();
+    
+    // Обновляем отображение ресурсов
+    updateResourceDisplay();
+    
+    // Запускаем автосохранение
+    setInterval(() => {
+        window.userManager.saveProgress();
+    }, 60000); // Каждую минуту
+}
+
+// Обновление отображения ресурсов
+function updateResourceDisplay() {
+    const resources = window.userManager.userProgress.resources;
+    
+    document.getElementById('fel').textContent = resources.FEL;
+    document.getElementById('irid').textContent = resources.MITHRIL;
+    document.getElementById('rubid').textContent = resources.RUBIDIUM;
+}
+
+// Запускаем игру при загрузке страницы
+document.addEventListener('DOMContentLoaded', initGame);
 
 // Глобальная функция для создания эффекта переноса ресурсов
 window.createResourceTransferEffect = function(button, resourceType) {

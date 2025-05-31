@@ -152,24 +152,36 @@ class ResourceLoader {
 
   async loadNFTImages() {
     try {
-      const response = await fetch('assets/nft/manifest.json');
-      const manifest = await response.json();
-      RESOURCES.nft = manifest.images || [];
-      this.totalResources += RESOURCES.nft.length;
-      console.log('NFT manifest loaded, total NFTs:', RESOURCES.nft.length);
+      // Загружаем только NFT из инвентаря пользователя и базовые NFT
+      const userNFTs = window.userManager?.userInventory?.getItems() || [];
+      const nftIds = new Set(userNFTs.map(nft => nft.id));
       
-      const nftPromises = RESOURCES.nft.map(nftPath => 
-        this.loadImage(`assets/nft/${nftPath}`).catch(error => {
-          console.error('NFT loading error:', nftPath, error);
-          return null;
-        })
+      // Получаем все NFT из конфигурации
+      const allNFTs = window.NFTManager.getAllNFTs();
+      
+      // Фильтруем NFT: берем все common и те, что есть у пользователя
+      const availableNFTs = allNFTs.filter(nft => 
+        nft.rarity === 'common' || nftIds.has(nft.id)
       );
       
-      await Promise.all(nftPromises);
+      RESOURCES.nft = availableNFTs.map(nft => nft.image);
+      this.totalResources += RESOURCES.nft.length;
+      console.log('NFT config loaded, total NFTs:', RESOURCES.nft.length);
+      
+      // Загружаем изображения последовательно
+      for (const nftPath of RESOURCES.nft) {
+        try {
+          await this.loadImage(nftPath);
+          console.log('Loaded NFT:', nftPath);
+        } catch (error) {
+          console.error('Failed to load NFT:', nftPath, error);
+        }
+      }
+      
       this.nftLoaded = true;
       console.log('All NFT images loaded');
     } catch (error) {
-      console.error('Error loading NFT manifest:', error);
+      console.error('Error loading NFTs:', error);
       this.nftLoaded = true;
     }
   }
