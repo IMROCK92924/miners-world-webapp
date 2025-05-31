@@ -27,16 +27,90 @@ const RESOURCES = {
   sounds: []
 };
 
-// Добавляем функцию предзагрузки изображения
-function preloadImage(src) {
+// Добавляем функцию проверки размера изображения
+function checkImageSize(img) {
+    return new Promise((resolve) => {
+        if (img.complete) {
+            resolve(img.naturalWidth * img.naturalHeight <= 4096 * 4096);
+        } else {
+            img.onload = () => resolve(img.naturalWidth * img.naturalHeight <= 4096 * 4096);
+        }
+    });
+}
+
+// Добавляем функцию оптимизации изображения
+async function optimizeImage(img) {
+    // Создаем canvas для изменения размера
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Максимальный размер для мобильных устройств
+    const MAX_SIZE = 1024;
+    
+    // Вычисляем новые размеры, сохраняя пропорции
+    let width = img.naturalWidth;
+    let height = img.naturalHeight;
+    
+    if (width > height) {
+        if (width > MAX_SIZE) {
+            height *= MAX_SIZE / width;
+            width = MAX_SIZE;
+        }
+    } else {
+        if (height > MAX_SIZE) {
+            width *= MAX_SIZE / height;
+            height = MAX_SIZE;
+        }
+    }
+    
+    // Устанавливаем размеры canvas
+    canvas.width = width;
+    canvas.height = height;
+    
+    // Рисуем изображение с новыми размерами
+    ctx.drawImage(img, 0, 0, width, height);
+    
+    // Возвращаем оптимизированное изображение
+    return new Promise((resolve) => {
+        canvas.toBlob((blob) => {
+            const optimizedUrl = URL.createObjectURL(blob);
+            const optimizedImg = new Image();
+            optimizedImg.src = optimizedUrl;
+            optimizedImg.onload = () => resolve(optimizedImg);
+        }, 'image/webp', 0.8); // Используем WebP с качеством 80%
+    });
+}
+
+// Обновляем функцию предзагрузки изображения
+async function preloadImage(src) {
     return new Promise((resolve, reject) => {
         const img = new Image();
-        img.onload = () => resolve(img);
+        
+        img.onload = async () => {
+            try {
+                // Проверяем размер изображения
+                const isSmallEnough = await checkImageSize(img);
+                
+                if (!isSmallEnough && /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                    console.log('Optimizing large image for mobile:', src);
+                    const optimizedImg = await optimizeImage(img);
+                    resolve(optimizedImg);
+                } else {
+                    resolve(img);
+                }
+            } catch (error) {
+                console.error('Error processing image:', error);
+                resolve(img); // В случае ошибки возвращаем оригинальное изображение
+            }
+        };
+        
         img.onerror = () => {
             console.error(`Failed to load image: ${src}`);
             reject(new Error(`Failed to load image: ${src}`));
         };
-        img.src = src;
+        
+        // Добавляем случайный параметр для предотвращения кэширования
+        img.src = `${src}?v=${Date.now()}`;
     });
 }
 
@@ -126,7 +200,7 @@ class ResourceLoader {
     try {
       // Используем таймаут для предотвращения зависания
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Image load timeout')), 10000);
+        setTimeout(() => reject(new Error('Image load timeout')), 15000); // Увеличиваем таймаут для мобильных
       });
       
       // Загружаем изображение с таймаутом
@@ -202,12 +276,17 @@ class ResourceLoader {
       
       console.log('NFT config loaded, total NFTs:', RESOURCES.nft.length);
       
-      // Загружаем изображения пакетами по 3 для оптимизации
-      const batchSize = 3;
+      // Загружаем изображения пакетами по 2 для мобильных устройств
+      const batchSize = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 2 : 3;
       for (let i = 0; i < RESOURCES.nft.length; i += batchSize) {
         const batch = RESOURCES.nft.slice(i, i + batchSize);
         await Promise.all(batch.map(nftPath => this.loadImage(nftPath)));
         console.log(`Loaded NFT batch ${i/batchSize + 1}`);
+        
+        // Добавляем небольшую задержку между пакетами для мобильных устройств
+        if (batchSize === 2) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
       }
       
       this.nftLoaded = true;

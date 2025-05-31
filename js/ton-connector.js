@@ -10,16 +10,13 @@ class TONConnector {
         try {
             console.log('Initializing TON Connect...');
             
-            // Создаем локальный манифест
-            const manifest = {
-                url: window.location.origin,
-                name: 'MinersWorld',
-                iconUrl: `${window.location.origin}/assets/logo.png`
-            };
+            // Инициализируем TON Connect
+            this.connector = new TonConnect();
             
-            // Инициализируем TON Connect с встроенным манифестом
-            this.connector = new TonConnect({
-                manifestUrl: manifest
+            // Настраиваем конфигурацию
+            await this.connector.setConfiguration({
+                manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react/tonconnect-manifest.json',
+                walletsListSource: 'https://raw.githubusercontent.com/ton-blockchain/wallets-list/main/wallets.json'
             });
             
             console.log('TON Connect initialized');
@@ -57,34 +54,45 @@ class TONConnector {
             const wallets = await this.connector.getWallets();
             console.log('Available wallets:', wallets);
             
-            // Если нет доступных кошельков, показываем сообщение
             if (!wallets || wallets.length === 0) {
-                alert('Пожалуйста, установите TON кошелек (например, Tonkeeper или MyTonWallet)');
+                const mobileWalletUrl = 'https://tonkeeper.com/';
+                if (confirm('Для работы требуется установить TON кошелек. Перейти к установке?')) {
+                    window.open(mobileWalletUrl, '_blank');
+                }
                 return false;
             }
 
-            // Формируем ссылку для подключения
-            const universalLink = await this.connector.connect({
-                universalLink: wallets[0].universalLink,
-                bridgeUrl: wallets[0].bridgeUrl
-            });
+            // Находим предпочтительный кошелек
+            const preferredWallet = wallets.find(w => w.name === 'Tonkeeper') || wallets[0];
+            console.log('Selected wallet:', preferredWallet.name);
 
-            console.log('Universal link generated:', universalLink);
+            try {
+                // Пытаемся подключиться
+                const universalLink = await this.connector.connect({
+                    universalLink: preferredWallet.universalLink,
+                    bridgeUrl: preferredWallet.bridgeUrl
+                });
 
-            // Если мы в мобильном браузере, редиректим на кошелек
-            if (this.isMobile()) {
-                console.log('Mobile device detected, redirecting to wallet...');
-                window.location.href = universalLink;
-            } else {
-                // На десктопе показываем QR код
-                console.log('Showing QR code for desktop...');
-                this.showQRModal(universalLink);
+                console.log('Universal link generated:', universalLink);
+
+                if (this.isMobile()) {
+                    // На мобильных устройствах открываем кошелек
+                    window.location.href = universalLink;
+                } else {
+                    // На десктопе показываем QR код
+                    this.showQRModal(universalLink);
+                }
+
+                return true;
+            } catch (connectionError) {
+                console.error('Connection attempt failed:', connectionError);
+                alert('Не удалось подключиться к кошельку. Попробуйте еще раз или используйте другой кошелек.');
+                return false;
             }
 
-            return true;
         } catch (error) {
             console.error('Connection error:', error);
-            alert('Ошибка подключения к кошельку. Пожалуйста, попробуйте еще раз.');
+            alert('Ошибка подключения к кошельку. Проверьте, что у вас установлен TON кошелек.');
             return false;
         }
     }
