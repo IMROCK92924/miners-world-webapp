@@ -29,6 +29,43 @@ const gameState = {
 // TON Connect
 let tonConnector = null;
 
+// Глобальные настройки
+const gameSettings = {
+    language: 'ru',
+    referralCount: 0
+};
+
+// Тексты для разных языков
+const translations = {
+    ru: {
+        settings: 'Настройки',
+        wallet: 'Кошелек',
+        connect: 'Подключить',
+        disconnect: 'Отключить',
+        nickname: 'Никнейм',
+        language: 'Язык',
+        referrals: 'Рефералы',
+        save: 'Сохранить',
+        cancel: 'Отмена'
+    },
+    en: {
+        settings: 'Settings',
+        wallet: 'Wallet',
+        connect: 'Connect',
+        disconnect: 'Disconnect',
+        nickname: 'Nickname',
+        language: 'Language',
+        referrals: 'Referrals',
+        save: 'Save',
+        cancel: 'Cancel'
+    }
+};
+
+// Функция для получения текста
+function getText(key) {
+    return translations[gameSettings.language][key];
+}
+
 // Инициализация TON Connect
 async function initTONConnect() {
   try {
@@ -272,54 +309,143 @@ function updateMiningTools() {
   });
 }
 
+// Обновляем функцию openModal
 function openModal(name) {
-  playSound('click');
-  if (name === "energy") {
+    playSound('click');
     const modalContainer = document.getElementById("modal-container");
     modalContainer.innerHTML = "";
     const modal = document.createElement("div");
     modal.className = `modal ${name}`;
-    
-    modal.innerHTML = `
-      <input id="energyInput" class="energy-input" type="number" 
-             min="${ENERGY_MIN}" max="${ENERGY_MAX}" 
-             placeholder="${ENERGY_MIN}–${ENERGY_MAX}"
-             value="${gameState.energy}">
-      <div class="modal-buttons">
-        <button id="energyConfirm">OK</button>
-        <button id="energyCancel" class="cancel">CANCEL</button>
-      </div>
-    `;
+
+    if (name === "settings") {
+        modal.innerHTML = `
+            <h2 class="settings-header">${getText('settings')}</h2>
+            
+            <div class="settings-section wallet-section">
+                <div class="settings-section-title">
+                    <i>💳</i> ${getText('wallet')}
+                </div>
+                ${tonConnector.isConnected ? `
+                    <div class="user-profile" style="position: relative; top: 0; right: 0;">
+                        <img class="user-avatar" src="${tonConnector.userProfile?.avatar || 'assets/default-avatar.png'}" alt="Avatar">
+                        <div class="user-info">
+                            <span class="user-nickname">${tonConnector.userProfile?.nickname || 'Anonymous'}</span>
+                            <span class="user-address">${tonConnector.userAddress ? `${tonConnector.userAddress.slice(0, 6)}...${tonConnector.userAddress.slice(-4)}` : ''}</span>
+                        </div>
+                    </div>
+                    <button class="settings-btn settings-cancel" onclick="tonConnector.disconnect()">${getText('disconnect')}</button>
+                ` : `
+                    <button class="settings-btn settings-save" onclick="tonConnector.connect()">${getText('connect')}</button>
+                `}
+            </div>
+            
+            <div class="settings-section">
+                <div class="settings-section-title">
+                    <i>👤</i> ${getText('nickname')}
+                </div>
+                <input type="text" class="nickname-input" value="${tonConnector.userProfile?.nickname || ''}" placeholder="Enter nickname">
+            </div>
+            
+            <div class="settings-section">
+                <div class="settings-section-title">
+                    <i>🌍</i> ${getText('language')}
+                </div>
+                <div class="language-selector">
+                    <button class="language-btn ${gameSettings.language === 'ru' ? 'active' : ''}" onclick="changeLanguage('ru')">Русский</button>
+                    <button class="language-btn ${gameSettings.language === 'en' ? 'active' : ''}" onclick="changeLanguage('en')">English</button>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="settings-section-title">
+                    <i>👥</i> ${getText('referrals')}
+                </div>
+                <div class="referral-info">
+                    <span class="referral-label">${getText('referrals')}:</span>
+                    <span class="referral-count">${gameSettings.referralCount}</span>
+                </div>
+            </div>
+            
+            <div class="settings-footer">
+                <button class="settings-btn settings-save" onclick="saveSettings()">${getText('save')}</button>
+                <button class="settings-btn settings-cancel" onclick="closeModal()">${getText('cancel')}</button>
+            </div>
+        `;
+    } else if (name === "energy") {
+        modal.innerHTML = `
+            <input id="energyInput" class="energy-input" type="number" 
+                   min="${ENERGY_MIN}" max="${ENERGY_MAX}" 
+                   placeholder="${ENERGY_MIN}–${ENERGY_MAX}"
+                   value="${gameState.energy}">
+            <div class="modal-buttons">
+                <button id="energyConfirm">OK</button>
+                <button id="energyCancel" class="cancel">CANCEL</button>
+            </div>
+        `;
+        
+        const input = document.getElementById("energyInput");
+        input.focus();
+        
+        document.getElementById("energyConfirm").onclick = () => {
+            const value = parseInt(input.value);
+            if (!isNaN(value) && value >= ENERGY_MIN && value <= ENERGY_MAX) {
+                setEnergyLevel(value);
+                playSound('success');
+                document.activeElement.blur();
+                modal.remove();
+            } else {
+                playSound('error');
+                alert(`Введите число от ${ENERGY_MIN} до ${ENERGY_MAX}`);
+            }
+        };
+        
+        document.getElementById("energyCancel").onclick = () => modal.remove();
+    } else if (name === "inventory") {
+        window.inventoryManager.show();
+    } else {
+        modal.style.backgroundImage = `url('assets/modal_${name}.png')`;
+    }
     
     modalContainer.appendChild(modal);
-    
-    const input = document.getElementById("energyInput");
-    input.focus();
-    
-    document.getElementById("energyConfirm").onclick = () => {
-      const value = parseInt(input.value);
-      if (!isNaN(value) && value >= ENERGY_MIN && value <= ENERGY_MAX) {
-        setEnergyLevel(value);
-        playSound('success');
-        document.activeElement.blur();
-        modal.remove();
-      } else {
-        playSound('error');
-        alert(`Введите число от ${ENERGY_MIN} до ${ENERGY_MAX}`);
-      }
-    };
-    
-    document.getElementById("energyCancel").onclick = () => modal.remove();
-  } else if (name === "inventory") {
-    window.inventoryManager.show();
-  } else {
+}
+
+// Функция закрытия модального окна
+function closeModal() {
     const modalContainer = document.getElementById("modal-container");
     modalContainer.innerHTML = "";
-    const modal = document.createElement("div");
-    modal.className = `modal ${name}`;
-    modal.style.backgroundImage = `url('assets/modal_${name}.png')`;
-    modalContainer.appendChild(modal);
-  }
+}
+
+// Функция изменения языка
+function changeLanguage(lang) {
+    gameSettings.language = lang;
+    // Перерисовываем модальное окно настроек
+    openModal('settings');
+}
+
+// Функция сохранения настроек
+async function saveSettings() {
+    // Сохраняем никнейм
+    const nicknameInput = document.querySelector('.nickname-input');
+    if (nicknameInput && tonConnector.userProfile) {
+        tonConnector.userProfile.nickname = nicknameInput.value;
+    }
+    
+    // Сохраняем настройки в localStorage
+    localStorage.setItem('gameSettings', JSON.stringify(gameSettings));
+    
+    // Закрываем модальное окно
+    closeModal();
+    
+    // Воспроизводим звук успеха
+    playSound('success');
+}
+
+// Загрузка настроек при старте
+function loadSettings() {
+    const savedSettings = localStorage.getItem('gameSettings');
+    if (savedSettings) {
+        Object.assign(gameSettings, JSON.parse(savedSettings));
+    }
 }
 
 let lastWidth = window.innerWidth;
@@ -355,6 +481,9 @@ async function initGame() {
     console.log('Initializing game...');
     
     try {
+        // Загружаем настройки
+        loadSettings();
+        
         // Инициализируем TON Connect
         await initTONConnect();
         
@@ -364,12 +493,7 @@ async function initGame() {
         // Инициализируем обработчики событий
         document.getElementById("inventory").onclick = () => openModal("inventory");
         document.getElementById("market").onclick = () => openModal("market");
-        document.getElementById("mining").onclick = () => {
-            playSound('click');
-            if (window.miningModal) {
-                window.miningModal.show();
-            }
-        };
+        document.getElementById("mining").onclick = () => openModal("settings");
         document.getElementById("home").onclick = () => {
             document.getElementById("modal-container").innerHTML = "";
         };

@@ -27,6 +27,19 @@ const RESOURCES = {
   sounds: []
 };
 
+// Добавляем функцию предзагрузки изображения
+function preloadImage(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => {
+            console.error(`Failed to load image: ${src}`);
+            reject(new Error(`Failed to load image: ${src}`));
+        };
+        img.src = src;
+    });
+}
+
 // Resource loader
 class ResourceLoader {
   constructor(onComplete) {
@@ -106,26 +119,44 @@ class ResourceLoader {
     return progress === 100;
   }
 
-  loadImage(src) {
+  async loadImage(src) {
     console.log('Loading image:', src);
     this.updateLoadingDetails(src);
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        console.log('Image loaded:', src);
-        this.cache.images[src] = img;
-        this.loadedResources++;
-        this.updateProgress();
-        resolve(img);
-      };
-      img.onerror = (error) => {
-        console.error('Error loading image:', src, error);
-        this.loadedResources++;
-        this.updateProgress();
-        reject(error);
-      };
-      img.src = src;
-    });
+    
+    try {
+      // Используем таймаут для предотвращения зависания
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Image load timeout')), 10000);
+      });
+      
+      // Загружаем изображение с таймаутом
+      const img = await Promise.race([
+        preloadImage(src),
+        timeoutPromise
+      ]);
+      
+      console.log('Image loaded successfully:', src);
+      this.cache.images[src] = img;
+      this.loadedResources++;
+      this.updateProgress();
+      return img;
+    } catch (error) {
+      console.error('Error loading image:', src, error);
+      // Для NFT изображений пробуем загрузить резервное изображение
+      if (src.includes('/nft/')) {
+        console.log('Attempting to load fallback image for NFT');
+        const fallbackSrc = 'assets/nft/fallback.png';
+        try {
+          const fallbackImg = await preloadImage(fallbackSrc);
+          this.cache.images[src] = fallbackImg;
+        } catch (fallbackError) {
+          console.error('Failed to load fallback image:', fallbackError);
+        }
+      }
+      this.loadedResources++;
+      this.updateProgress();
+      return null;
+    }
   }
 
   loadSound(src) {
@@ -152,6 +183,8 @@ class ResourceLoader {
 
   async loadNFTImages() {
     try {
+      console.log('Starting NFT images loading...');
+      
       // Загружаем только NFT из инвентаря пользователя и базовые NFT
       const userNFTs = window.userManager?.userInventory?.getItems() || [];
       const nftIds = new Set(userNFTs.map(nft => nft.id));
@@ -166,16 +199,15 @@ class ResourceLoader {
       
       RESOURCES.nft = availableNFTs.map(nft => nft.image);
       this.totalResources += RESOURCES.nft.length;
+      
       console.log('NFT config loaded, total NFTs:', RESOURCES.nft.length);
       
-      // Загружаем изображения последовательно
-      for (const nftPath of RESOURCES.nft) {
-        try {
-          await this.loadImage(nftPath);
-          console.log('Loaded NFT:', nftPath);
-        } catch (error) {
-          console.error('Failed to load NFT:', nftPath, error);
-        }
+      // Загружаем изображения пакетами по 3 для оптимизации
+      const batchSize = 3;
+      for (let i = 0; i < RESOURCES.nft.length; i += batchSize) {
+        const batch = RESOURCES.nft.slice(i, i + batchSize);
+        await Promise.all(batch.map(nftPath => this.loadImage(nftPath)));
+        console.log(`Loaded NFT batch ${i/batchSize + 1}`);
       }
       
       this.nftLoaded = true;
