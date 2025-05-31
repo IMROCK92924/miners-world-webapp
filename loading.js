@@ -4,6 +4,7 @@ console.log('loading.js: Starting initialization');
 const RESOURCE_CATEGORIES = {
   interface: ['btn_', 'modal_'],
   graphics: ['background', 'energy_'],
+  nft: ['nft/'],
   sounds: ['.mp3', '.wav']
 };
 
@@ -22,18 +23,21 @@ const RESOURCES = {
     'assets/modal_mining.png',
     ...Array.from({length: 11}, (_, i) => `assets/energy/energy_${i}.png`)
   ],
+  nft: [],
   sounds: []
 };
 
 // Resource loader
 class ResourceLoader {
   constructor(onComplete) {
+    this.nftLoaded = false;
     this.totalResources = RESOURCES.images.length + RESOURCES.sounds.length;
     this.loadedResources = 0;
     this.currentCategory = '';
     this.cache = {
       images: {},
-      sounds: {}
+      sounds: {},
+      nft: {}
     };
     this.onComplete = onComplete;
     this.startTime = Date.now();
@@ -146,26 +150,54 @@ class ResourceLoader {
     });
   }
 
+  async loadNFTImages() {
+    try {
+      const response = await fetch('assets/nft/manifest.json');
+      const manifest = await response.json();
+      RESOURCES.nft = manifest.images || [];
+      this.totalResources += RESOURCES.nft.length;
+      console.log('NFT manifest loaded, total NFTs:', RESOURCES.nft.length);
+      
+      const nftPromises = RESOURCES.nft.map(nftPath => 
+        this.loadImage(`assets/nft/${nftPath}`).catch(error => {
+          console.error('NFT loading error:', nftPath, error);
+          return null;
+        })
+      );
+      
+      await Promise.all(nftPromises);
+      this.nftLoaded = true;
+      console.log('All NFT images loaded');
+    } catch (error) {
+      console.error('Error loading NFT manifest:', error);
+      this.nftLoaded = true;
+    }
+  }
+
   async loadAll() {
     console.log('Starting to load all resources');
     document.getElementById('loading-details').textContent = 'Preparing resources...';
     
     try {
-      const imagePromises = RESOURCES.images.map(src => 
-        this.loadImage(src).catch(error => {
-          console.error('Resource loading error:', src, error);
-          return null;
-        })
-      );
-      const soundPromises = RESOURCES.sounds.map(src => 
-        this.loadSound(src).catch(error => {
-          console.error('Resource loading error:', src, error);
-          return null;
-        })
-      );
-      
-      const results = await Promise.all([...imagePromises, ...soundPromises]);
-      const failedResources = results.filter(r => r === null).length;
+      const [basicResourcesResult] = await Promise.all([
+        Promise.all([
+          ...RESOURCES.images.map(src => 
+            this.loadImage(src).catch(error => {
+              console.error('Resource loading error:', src, error);
+              return null;
+            })
+          ),
+          ...RESOURCES.sounds.map(src => 
+            this.loadSound(src).catch(error => {
+              console.error('Resource loading error:', src, error);
+              return null;
+            })
+          )
+        ]),
+        this.loadNFTImages()
+      ]);
+
+      const failedResources = basicResourcesResult.filter(r => r === null).length;
       
       if (failedResources > 0) {
         console.warn(`Loading completed with ${failedResources} errors`);

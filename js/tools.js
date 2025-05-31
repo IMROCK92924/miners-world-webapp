@@ -6,148 +6,182 @@ class ToolSlotManager {
     constructor() {
         this.container = document.querySelector('.mining-container');
         this.slots = [];
-        this.activeSlots = 0; // Количество заполненных слотов
+        this.maxSlots = 6; // Максимальное количество слотов
+        this.activeSlots = 0; // Количество активных слотов
         this.initializeSlots();
     }
 
-    // Инициализация начальных слотов
     initializeSlots() {
+        this.container.innerHTML = '';
         this.createEmptySlot(); // Создаем первый слот
     }
 
-    // Создание пустого слота
     createEmptySlot() {
+        if (this.slots.length >= this.maxSlots) return; // Проверка на максимум слотов
+
         const slot = document.createElement('div');
         slot.className = 'tool-slot empty';
-        
-        const addButton = document.createElement('button');
-        addButton.className = 'add-tool-btn';
-        addButton.textContent = '+';
-        addButton.addEventListener('click', () => this.handleAddTool(slot));
-        
-        slot.appendChild(addButton);
+        slot.innerHTML = `
+            <button class="add-tool-btn">+</button>
+        `;
         this.container.appendChild(slot);
         this.slots.push(slot);
+
+        // Добавляем обработчик для кнопки добавления
+        const addButton = slot.querySelector('.add-tool-btn');
+        addButton.addEventListener('click', () => {
+            if (window.inventoryManager) {
+                window.inventoryManager.show();
+            }
+        });
     }
 
-    // Обработчик нажатия на кнопку добавления инструмента
-    handleAddTool(slot) {
-        document.getElementById('inventory').click();
-    }
-
-    // Добавление инструмента в слот
-    addToolToSlot(slot, toolData) {
-        slot.className = 'tool-slot active';
-        slot.innerHTML = '';
-
-        const content = document.createElement('div');
-        content.className = 'tool-content';
+    addToolToSlot(slot, tool) {
+        const durability = tool.durability || { current: 100, max: 100 };
+        slot.className = `tool-slot active ${tool.rarity}`;
+        slot.dataset.toolId = tool.id;
         
-        const imageContainer = document.createElement('div');
-        imageContainer.className = 'tool-image-container';
-        const img = document.createElement('img');
-        img.src = toolData.image;
-        img.alt = toolData.name;
-        imageContainer.appendChild(img);
-        
-        const info = document.createElement('div');
-        info.className = 'tool-info';
-        
-        const header = document.createElement('div');
-        header.className = 'tool-header';
-        
-        const name = document.createElement('div');
-        name.className = 'tool-name';
-        name.textContent = toolData.name;
-        
-        const rarity = document.createElement('div');
-        rarity.className = `tool-rarity ${toolData.rarity.toLowerCase()}`;
-        rarity.textContent = toolData.rarity;
-        
-        header.appendChild(name);
-        header.appendChild(rarity);
-        
-        const stats = document.createElement('div');
-        stats.className = 'tool-stats';
-        
-        const harvestTime = document.createElement('div');
-        harvestTime.className = 'stat-item';
-        harvestTime.innerHTML = `
-            <span class="stat-label">Harvest Time</span>
-            <span class="stat-value">${toolData.harvestTime}s</span>
+        slot.innerHTML = `
+            <div class="tool-content">
+                <div class="tool-image-container">
+                    <img src="${tool.image}" alt="${tool.name}" onerror="this.src='assets/nft/FLASK.png'">
+                </div>
+                <div class="tool-info">
+                    <div class="tool-header">
+                        <span class="tool-name">${tool.name}</span>
+                        <span class="tool-rarity">${tool.rarity}</span>
+                    </div>
+                    <div class="tool-stats">
+                        <div class="stat">
+                            <span class="stat-label">Durability:</span>
+                            <span class="stat-value">${durability.current}/${durability.max}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Harvest Time:</span>
+                            <span class="stat-value">${tool.harvestTime}s</span>
+                        </div>
+                    </div>
+                    <button class="tool-claim" onclick="window.toolSlotManager.handleClaim('${tool.id}')">CLAIM</button>
+                </div>
+            </div>
         `;
-        
-        const durability = document.createElement('div');
-        durability.className = 'stat-item';
-        durability.innerHTML = `
-            <span class="stat-label">Durability</span>
-            <span class="stat-value">${toolData.durability.current}/${toolData.durability.max}</span>
-        `;
-        
-        stats.appendChild(harvestTime);
-        stats.appendChild(durability);
-        
-        const claimButton = document.createElement('button');
-        claimButton.className = 'tool-claim';
-        claimButton.textContent = 'Claim';
-        claimButton.addEventListener('click', () => this.handleClaim(toolData));
-        
-        info.appendChild(header);
-        info.appendChild(stats);
-        info.appendChild(claimButton);
-        
-        content.appendChild(imageContainer);
-        content.appendChild(info);
-        slot.appendChild(content);
 
         this.activeSlots++;
         
-        // Создаем новый слот, если все текущие заполнены
-        if (this.activeSlots === this.slots.length) {
+        // Создаем новый пустой слот, если есть место
+        if (this.activeSlots < this.maxSlots) {
             this.createEmptySlot();
         }
     }
 
-    // Обработчик нажатия на кнопку Claim
-    handleClaim(toolData) {
-        console.log('Claiming tool:', toolData);
-        // Здесь будет логика сбора ресурсов
+    handleClaim(toolId) {
+        const tool = NFTManager.getNFTById(toolId);
+        if (!tool) return;
+
+        // Анимация кнопки
+        const slot = this.slots.find(slot => slot.dataset.toolId === toolId);
+        if (!slot) return;
+
+        const claimButton = slot.querySelector('.tool-claim');
+        if (claimButton) {
+            claimButton.style.opacity = '0.5';
+            setTimeout(() => {
+                claimButton.style.opacity = '1';
+            }, 200);
+        }
+
+        // Добываем ресурсы
+        const resourceAmount = tool.stats.power;
+        const resourceType = tool.resourceType;
+        
+        // Обновляем счетчики ресурсов
+        const resourceElements = {
+            'FEL': document.getElementById('fel'),
+            'MITHRIL': document.getElementById('irid'),
+            'RUBIDIUM': document.getElementById('rubid')
+        };
+
+        const resourceElement = resourceElements[resourceType];
+        if (resourceElement) {
+            const currentAmount = parseInt(resourceElement.textContent) || 0;
+            resourceElement.textContent = currentAmount + resourceAmount;
+            
+            // Анимация счетчика
+            resourceElement.classList.add('highlight');
+            setTimeout(() => {
+                resourceElement.classList.remove('highlight');
+            }, 500);
+
+            // Создаем всплывающее уведомление
+            const popup = document.createElement('div');
+            popup.className = `resource-popup ${resourceType}`;
+            popup.textContent = `+${resourceAmount} ${resourceType}`;
+            slot.appendChild(popup);
+
+            // Удаляем popup после анимации
+            setTimeout(() => {
+                popup.remove();
+            }, 1500);
+
+            // Создаем летящие частицы
+            this.createResourceParticles(slot, resourceType, resourceElement);
+        }
     }
 
-    // Удаление инструмента из слота
+    createResourceParticles(slot, resourceType, targetElement) {
+        const slotRect = slot.getBoundingClientRect();
+        const targetRect = targetElement.getBoundingClientRect();
+        
+        // Создаем несколько частиц
+        for (let i = 0; i < 5; i++) {
+            const particle = document.createElement('div');
+            particle.className = `resource-particle ${resourceType}`;
+            
+            // Рассчитываем начальную позицию (от кнопки CLAIM)
+            const startX = slotRect.left + slotRect.width / 2;
+            const startY = slotRect.top + slotRect.height / 2;
+            
+            // Рассчитываем конечную позицию (к счетчику ресурса)
+            const endX = targetRect.left + targetRect.width / 2;
+            const endY = targetRect.top + targetRect.height / 2;
+            
+            // Добавляем случайное отклонение для каждой частицы
+            const randomOffsetX = (Math.random() - 0.5) * 50;
+            const randomOffsetY = (Math.random() - 0.5) * 50;
+            
+            particle.style.left = `${startX}px`;
+            particle.style.top = `${startY}px`;
+            particle.style.setProperty('--tx', `${endX - startX + randomOffsetX}px`);
+            particle.style.setProperty('--ty', `${endY - startY + randomOffsetY}px`);
+            
+            document.body.appendChild(particle);
+            
+            // Удаляем частицу после анимации
+            setTimeout(() => {
+                particle.remove();
+            }, 1000);
+        }
+    }
+
     removeToolFromSlot(slot) {
         slot.className = 'tool-slot empty';
-        slot.innerHTML = '';
-        const addButton = document.createElement('button');
-        addButton.className = 'add-tool-btn';
-        addButton.textContent = '+';
-        addButton.addEventListener('click', () => this.handleAddTool(slot));
-        slot.appendChild(addButton);
+        slot.innerHTML = `
+            <button class="add-tool-btn">+</button>
+        `;
+        delete slot.dataset.toolId;
         this.activeSlots--;
 
-        // Удаляем лишние пустые слоты, оставляя только один после последнего заполненного
-        while (this.slots.length > this.activeSlots + 1) {
-            const lastSlot = this.slots.pop();
-            lastSlot.remove();
-        }
+        // Добавляем обработчик для новой кнопки
+        const addButton = slot.querySelector('.add-tool-btn');
+        addButton.addEventListener('click', () => {
+            if (window.inventoryManager) {
+                window.inventoryManager.show();
+            }
+        });
     }
 }
 
-// Инициализация менеджера слотов при загрузке страницы
-window.addEventListener('DOMContentLoaded', () => {
+// Создаем глобальный экземпляр после загрузки DOM
+document.addEventListener('DOMContentLoaded', () => {
     window.toolSlotManager = new ToolSlotManager();
-    
-    // Пример добавления инструмента (для тестирования)
-    /*
-    setTimeout(() => {
-        const testTool = {
-            name: "Diamond Pickaxe",
-            image: "assets/tools/diamond_pickaxe.png",
-            rarity: "Epic",
-            harvestTime: 30,
-            durability: 100
-        };
-        window.toolSlotManager.addToolToSlot(window.toolSlotManager.slots[0], testTool);
-    }, 1000);
-    */
 }); 
