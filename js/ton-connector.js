@@ -55,9 +55,17 @@ class TONConnector {
             console.log('Available wallets:', wallets);
             
             if (!wallets || wallets.length === 0) {
-                const mobileWalletUrl = 'https://tonkeeper.com/';
-                if (confirm('Для работы требуется установить TON кошелек. Перейти к установке?')) {
-                    window.open(mobileWalletUrl, '_blank');
+                const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent);
+                const message = isMobile
+                    ? 'Для работы с приложением необходим TON кошелек. Рекомендуем установить Tonkeeper.'
+                    : 'Для работы с приложением необходим TON кошелек. Рекомендуем установить расширение Tonkeeper для браузера.';
+                
+                const installUrl = isMobile
+                    ? 'https://tonkeeper.com/download/'
+                    : 'https://chrome.google.com/webstore/detail/ton-wallet/nphplpgoakhhjchkkhmiggakijnkhfnd';
+                
+                if (confirm(message + '\n\nПерейти к установке?')) {
+                    window.open(installUrl, '_blank');
                 }
                 return false;
             }
@@ -86,13 +94,16 @@ class TONConnector {
                 return true;
             } catch (connectionError) {
                 console.error('Connection attempt failed:', connectionError);
-                alert('Не удалось подключиться к кошельку. Попробуйте еще раз или используйте другой кошелек.');
+                const errorMessage = this.isMobile()
+                    ? 'Не удалось подключиться к кошельку. Убедитесь, что у вас установлен TON кошелек и попробуйте еще раз.'
+                    : 'Не удалось подключиться к кошельку. Проверьте, что расширение TON кошелька установлено и активировано в браузере.';
+                alert(errorMessage);
                 return false;
             }
 
         } catch (error) {
             console.error('Connection error:', error);
-            alert('Ошибка подключения к кошельку. Проверьте, что у вас установлен TON кошелек.');
+            alert('Произошла ошибка при подключении к кошельку. Пожалуйста, обновите страницу и попробуйте снова.');
             return false;
         }
     }

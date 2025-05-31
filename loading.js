@@ -81,37 +81,83 @@ async function optimizeImage(img) {
     });
 }
 
+// Функция проверки доступности изображения
+async function checkImageAvailability(src) {
+    try {
+        const response = await fetch(src, { method: 'HEAD' });
+        return response.ok;
+    } catch (error) {
+        console.error(`Image availability check failed for ${src}:`, error);
+        return false;
+    }
+}
+
 // Обновляем функцию предзагрузки изображения
 async function preloadImage(src) {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        
-        img.onload = async () => {
-            try {
-                // Проверяем размер изображения
-                const isSmallEnough = await checkImageSize(img);
-                
-                if (!isSmallEnough && /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-                    console.log('Optimizing large image for mobile:', src);
-                    const optimizedImg = await optimizeImage(img);
-                    resolve(optimizedImg);
-                } else {
-                    resolve(img);
+    try {
+        // Проверяем доступность изображения
+        const isAvailable = await checkImageAvailability(src);
+        if (!isAvailable) {
+            console.error(`Image not available: ${src}`);
+            throw new Error(`Image not available: ${src}`);
+        }
+
+        // Нормализуем путь к изображению
+        const normalizedSrc = src.startsWith('http') ? src : new URL(src, window.location.origin).href;
+        console.log('Loading image from:', normalizedSrc);
+
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            
+            img.onload = async () => {
+                try {
+                    console.log(`Image loaded successfully: ${normalizedSrc}, size: ${img.naturalWidth}x${img.naturalHeight}`);
+                    
+                    // Проверяем размер изображения
+                    const isSmallEnough = await checkImageSize(img);
+                    
+                    if (!isSmallEnough && /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                        console.log('Optimizing large image for mobile:', normalizedSrc);
+                        const optimizedImg = await optimizeImage(img);
+                        resolve(optimizedImg);
+                    } else {
+                        resolve(img);
+                    }
+                } catch (error) {
+                    console.error('Error processing image:', error);
+                    resolve(img); // В случае ошибки возвращаем оригинальное изображение
                 }
-            } catch (error) {
-                console.error('Error processing image:', error);
-                resolve(img); // В случае ошибки возвращаем оригинальное изображение
+            };
+            
+            img.onerror = () => {
+                const error = new Error(`Failed to load image: ${normalizedSrc}`);
+                console.error(error);
+                reject(error);
+            };
+            
+            // Добавляем обработку таймаута
+            const timeout = setTimeout(() => {
+                img.src = ''; // Отменяем загрузку
+                reject(new Error(`Timeout loading image: ${normalizedSrc}`));
+            }, 10000);
+
+            img.onload = () => {
+                clearTimeout(timeout);
+                resolve(img);
+            };
+            
+            // Используем crossOrigin для изображений с других доменов
+            if (normalizedSrc.startsWith('http') && !normalizedSrc.includes(window.location.origin)) {
+                img.crossOrigin = 'anonymous';
             }
-        };
-        
-        img.onerror = () => {
-            console.error(`Failed to load image: ${src}`);
-            reject(new Error(`Failed to load image: ${src}`));
-        };
-        
-        // Добавляем случайный параметр для предотвращения кэширования
-        img.src = `${src}?v=${Date.now()}`;
-    });
+            
+            // Добавляем случайный параметр для предотвращения кэширования
+            img.src = `${normalizedSrc}?v=${Date.now()}`;
+        });
+    } catch (error) {
+        console.error('Error in preloadImage:', error);
+        throw error;
+    }
 }
 
 // Resource loader
@@ -198,35 +244,49 @@ class ResourceLoader {
     this.updateLoadingDetails(src);
     
     try {
-      // Используем таймаут для предотвращения зависания
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Image load timeout')), 15000); // Увеличиваем таймаут для мобильных
-      });
+      // Проверяем наличие изображения в кэше
+      if (this.cache.images[src]) {
+        console.log('Image found in cache:', src);
+        return this.cache.images[src];
+      }
+
+      const img = await preloadImage(src);
       
-      // Загружаем изображение с таймаутом
-      const img = await Promise.race([
-        preloadImage(src),
-        timeoutPromise
-      ]);
-      
-      console.log('Image loaded successfully:', src);
-      this.cache.images[src] = img;
-      this.loadedResources++;
-      this.updateProgress();
-      return img;
+      if (img) {
+        console.log('Image loaded and cached:', src);
+        this.cache.images[src] = img;
+        this.loadedResources++;
+        this.updateProgress();
+        return img;
+      } else {
+        throw new Error('Image loading failed');
+      }
     } catch (error) {
       console.error('Error loading image:', src, error);
+      
       // Для NFT изображений пробуем загрузить резервное изображение
       if (src.includes('/nft/')) {
         console.log('Attempting to load fallback image for NFT');
-        const fallbackSrc = 'assets/nft/fallback.png';
         try {
-          const fallbackImg = await preloadImage(fallbackSrc);
-          this.cache.images[src] = fallbackImg;
+          // Пробуем разные форматы
+          const formats = ['webp', 'png', 'jpg'];
+          for (const format of formats) {
+            const fallbackSrc = `assets/nft/fallback.${format}`;
+            try {
+              const fallbackImg = await preloadImage(fallbackSrc);
+              if (fallbackImg) {
+                this.cache.images[src] = fallbackImg;
+                break;
+              }
+            } catch (e) {
+              console.log(`Failed to load ${format} fallback`);
+            }
+          }
         } catch (fallbackError) {
-          console.error('Failed to load fallback image:', fallbackError);
+          console.error('All fallback image attempts failed:', fallbackError);
         }
       }
+      
       this.loadedResources++;
       this.updateProgress();
       return null;
@@ -276,23 +336,41 @@ class ResourceLoader {
       
       console.log('NFT config loaded, total NFTs:', RESOURCES.nft.length);
       
-      // Загружаем изображения пакетами по 2 для мобильных устройств
-      const batchSize = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 2 : 3;
+      // На мобильных устройствах загружаем по одному
+      const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const batchSize = isMobile ? 1 : 3;
+      
       for (let i = 0; i < RESOURCES.nft.length; i += batchSize) {
         const batch = RESOURCES.nft.slice(i, i + batchSize);
-        await Promise.all(batch.map(nftPath => this.loadImage(nftPath)));
-        console.log(`Loaded NFT batch ${i/batchSize + 1}`);
+        console.log(`Loading NFT batch ${i/batchSize + 1} of ${Math.ceil(RESOURCES.nft.length/batchSize)}`);
         
-        // Добавляем небольшую задержку между пакетами для мобильных устройств
-        if (batchSize === 2) {
-          await new Promise(resolve => setTimeout(resolve, 100));
+        try {
+          const results = await Promise.all(
+            batch.map(async nftPath => {
+              try {
+                return await this.loadImage(nftPath);
+              } catch (error) {
+                console.error(`Failed to load NFT: ${nftPath}`, error);
+                return null;
+              }
+            })
+          );
+          
+          console.log(`Batch ${i/batchSize + 1} results:`, results);
+          
+          // На мобильных устройствах делаем паузу между загрузками
+          if (isMobile) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+          }
+        } catch (batchError) {
+          console.error(`Error loading batch ${i/batchSize + 1}:`, batchError);
         }
       }
       
       this.nftLoaded = true;
-      console.log('All NFT images loaded');
+      console.log('All NFT images loading completed');
     } catch (error) {
-      console.error('Error loading NFTs:', error);
+      console.error('Error in loadNFTImages:', error);
       this.nftLoaded = true;
     }
   }
