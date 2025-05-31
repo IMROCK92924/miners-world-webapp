@@ -26,20 +26,113 @@ const gameState = {
   }
 };
 
+// TON Connect
+let tonConnector = null;
+
+// Инициализация TON Connect
+async function initTONConnect() {
+  try {
+    tonConnector = new TONConnector();
+    
+    // Устанавливаем обработчики событий
+    tonConnector.onConnected = handleWalletConnected;
+    tonConnector.onDisconnected = handleWalletDisconnected;
+    
+    // Инициализируем коннектор
+    await tonConnector.initialize();
+    
+    // Настраиваем обработчик кнопки подключения
+    const connectButton = document.getElementById('connect-wallet');
+    connectButton.onclick = () => tonConnector.connect();
+    
+    return true;
+  } catch (error) {
+    console.error('TON Connect initialization error:', error);
+    return false;
+  }
+}
+
+// Обработчик успешного подключения кошелька
+function handleWalletConnected(profile) {
+  // Обновляем UI
+  document.getElementById('connect-wallet').style.display = 'none';
+  document.getElementById('user-profile').style.display = 'flex';
+  document.getElementById('user-nickname').textContent = profile.nickname;
+  document.getElementById('user-address').textContent = 
+    `${profile.address.slice(0, 6)}...${profile.address.slice(-4)}`;
+  document.getElementById('user-avatar').src = profile.avatar;
+  
+  // Загружаем данные пользователя
+  loadUserData(profile.address);
+}
+
+// Обработчик отключения кошелька
+function handleWalletDisconnected() {
+  // Обновляем UI
+  document.getElementById('connect-wallet').style.display = 'block';
+  document.getElementById('user-profile').style.display = 'none';
+  document.getElementById('user-nickname').textContent = 'Anonymous';
+  document.getElementById('user-address').textContent = 'Not connected';
+  document.getElementById('user-avatar').src = 'assets/default-avatar.png';
+  
+  // Сбрасываем данные пользователя
+  resetUserData();
+}
+
+// Загрузка данных пользователя
+async function loadUserData(address) {
+  try {
+    // Получаем данные пользователя из UserManager
+    const userData = await window.userManager.loadUserProgress(address);
+    if (userData) {
+      // Обновляем состояние игры
+      Object.assign(gameState, userData);
+      // Обновляем UI
+      updateUI();
+    }
+  } catch (error) {
+    console.error('Error loading user data:', error);
+  }
+}
+
+// Сброс данных пользователя
+function resetUserData() {
+  // Сбрасываем состояние игры
+  gameState.energy = 3;
+  gameState.resources = {
+    irid: 0,
+    rubid: 0,
+    fel: 0
+  };
+  // Обновляем UI
+  updateUI();
+}
+
 // Сохранение состояния
 function saveGameState() {
+  if (tonConnector && tonConnector.isConnected) {
+    // Если пользователь авторизован, сохраняем в его профиль
+    window.userManager.saveUserProgress(tonConnector.userAddress, gameState);
+  }
+  // В любом случае сохраняем локально
   localStorage.setItem('gameState', JSON.stringify(gameState));
 }
 
 // Загрузка состояния
-function loadGameState() {
+async function loadGameState() {
   try {
-    const saved = localStorage.getItem('gameState');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      Object.assign(gameState, parsed);
-      updateUI();
+    if (tonConnector && tonConnector.isConnected) {
+      // Если пользователь авторизован, загружаем его данные
+      await loadUserData(tonConnector.userAddress);
+    } else {
+      // Иначе загружаем локальные данные
+      const saved = localStorage.getItem('gameState');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        Object.assign(gameState, parsed);
+      }
     }
+    updateUI();
   } catch (error) {
     console.error('Error loading game state:', error);
   }
@@ -257,25 +350,16 @@ const handleResize = debounce(() => {
   scaleGame();
 }, 250);
 
-// Инициализация игры
+// Обновляем инициализацию игры
 async function initGame() {
     console.log('Initializing game...');
     
     try {
+        // Инициализируем TON Connect
+        await initTONConnect();
+        
         // Создаем экземпляр UserManager
         window.userManager = new UserManager();
-        
-        // TODO: Здесь будет реальная авторизация
-        const userId = localStorage.getItem('userId') || 'test-user';
-        
-        // Авторизуем пользователя
-        const loginSuccess = await window.userManager.login(userId);
-        if (!loginSuccess) {
-            throw new Error('Login failed');
-        }
-
-        // Загружаем сохраненное состояние
-        loadGameState();
         
         // Инициализируем обработчики событий
         document.getElementById("inventory").onclick = () => openModal("inventory");

@@ -740,3 +740,120 @@ html, body {
   transition: all 0.3s ease;
   text-shadow: 0 0 10px var(--primary-color);
 }
+
+/* TON Connect стили */
+.ton-connect-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.ton-connect-content {
+    background: rgba(0, 0, 0, 0.9);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+}
+
+.ton-connect-content h2 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.ton-connect-content #qrcode {
+    margin: 20px auto;
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
+    width: 256px;
+    height: 256px;
+}
+
+.ton-connect-content p {
+    color: #fff;
+    margin: 15px 0;
+}
+
+.ton-connect-close {
+    background: #444;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+}
+
+.ton-connect-close:hover {
+    background: #555;
+}
+
+/* Профиль пользователя */
+.user-profile {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid var(--primary-color);
+    z-index: 10;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    border: 2px solid var(--primary-color);
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-nickname {
+    color: var(--primary-color);
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.user-address {
+    color: #888;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.connect-wallet-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(45deg, #0088cc, #00b8ff);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+.connect-wallet-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(0, 184, 255, 0.5);
+}
