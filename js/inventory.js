@@ -1,10 +1,21 @@
 class InventoryManager {
     constructor() {
-        // Всегда используем все NFT из конфига
-        this.tools = NFTManager.getAllNFTs();
+        // Инициализируем пустой массив инструментов
+        this.tools = [];
     }
 
-    show() {
+    show(showAllTools = false) {
+        // Обновляем список инструментов в зависимости от контекста
+        if (showAllTools) {
+            // Показываем все NFT из конфига
+            this.tools = NFTManager.getAllNFTs();
+        } else {
+            // Показываем только доступные пользователю NFT
+            const userNFTs = window.userManager?.userInventory?.getItems() || [];
+            const commonNFTs = NFTManager.getAllNFTs().filter(nft => nft.rarity === 'common');
+            this.tools = [...userNFTs, ...commonNFTs];
+        }
+
         const modalContainer = document.getElementById("modal-container");
         modalContainer.innerHTML = "";
         

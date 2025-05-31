@@ -13,13 +13,21 @@ class TONConnector {
             // Инициализируем TON Connect
             this.connector = new TonConnect();
             
-            // Настраиваем конфигурацию
+            // Настраиваем конфигурацию для локальной разработки
+            const manifestUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                ? `${window.location.origin}/tonconnect-manifest.json`
+                : 'https://miners-world.com/tonconnect-manifest.json';
+            
             await this.connector.setConfiguration({
-                manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react/tonconnect-manifest.json',
-                walletsListSource: 'https://raw.githubusercontent.com/ton-blockchain/wallets-list/main/wallets.json'
+                manifestUrl,
+                walletsListSource: 'https://raw.githubusercontent.com/ton-blockchain/wallets-list/main/wallets.json',
+                retryConfig: {
+                    maxAttempts: 3,
+                    timeout: 3000
+                }
             });
             
-            console.log('TON Connect initialized');
+            console.log('TON Connect initialized with manifest:', manifestUrl);
 
             // Подписываемся на изменения состояния подключения
             this.connector.onStatusChange((wallet) => {
@@ -91,6 +99,27 @@ class TONConnector {
                     this.showQRModal(universalLink);
                 }
 
+                // Добавляем обработчик для проверки статуса подключения
+                let connectionCheckAttempts = 0;
+                const checkConnection = setInterval(async () => {
+                    try {
+                        const status = await this.connector.getWalletInfo();
+                        if (status && status.connected) {
+                            clearInterval(checkConnection);
+                            console.log('Connection successful');
+                            this.handleConnectionChange(status);
+                        } else {
+                            connectionCheckAttempts++;
+                            if (connectionCheckAttempts >= 30) { // 30 секунд таймаут
+                                clearInterval(checkConnection);
+                                throw new Error('Connection timeout');
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Connection check error:', error);
+                    }
+                }, 1000);
+
                 return true;
             } catch (connectionError) {
                 console.error('Connection attempt failed:', connectionError);
@@ -141,13 +170,13 @@ class TONConnector {
             // Закрываем модальное окно с QR кодом, если оно открыто
             this.closeQRModal();
             
+            // Обновляем UI профиля
+            this.updateProfileUI();
+            
             // Вызываем колбэк успешного подключения
             if (this.onConnected) {
                 this.onConnected(this.userProfile);
             }
-            
-            // Обновляем UI
-            this.updateUI();
         } else {
             console.log('Wallet disconnected');
             this.isConnected = false;
@@ -155,13 +184,13 @@ class TONConnector {
             this.userProfile = null;
             localStorage.removeItem('wallet');
             
+            // Обновляем UI профиля при отключении
+            this.updateProfileUI();
+            
             // Вызываем колбэк отключения
             if (this.onDisconnected) {
                 this.onDisconnected();
             }
-            
-            // Обновляем UI
-            this.updateUI();
         }
     }
 
@@ -192,11 +221,35 @@ class TONConnector {
         }
     }
 
-    updateUI() {
-        // Обновляем модальное окно настроек, если оно открыто
-        const settingsModal = document.querySelector('.modal.settings');
-        if (settingsModal) {
-            openModal('settings');
+    updateProfileUI() {
+        const userContainer = document.getElementById('user-container');
+        const connectButton = document.getElementById('connect-wallet');
+        const userProfile = document.getElementById('user-profile');
+        const userNickname = document.getElementById('user-nickname');
+        const userAddress = document.getElementById('user-address');
+        const userAvatar = document.getElementById('user-avatar');
+
+        if (this.isConnected && this.userProfile) {
+            // Скрываем кнопку подключения и показываем профиль
+            connectButton.style.display = 'none';
+            userProfile.style.display = 'flex';
+            
+            // Обновляем данные профиля
+            userNickname.textContent = this.userProfile.nickname;
+            userAddress.textContent = this.userAddress.slice(0, 6) + '...' + this.userAddress.slice(-4);
+            userAvatar.src = this.userProfile.avatar;
+            
+            // Добавляем обработчик клика для отключения
+            userProfile.onclick = () => this.disconnect();
+        } else {
+            // Показываем кнопку подключения и скрываем профиль
+            connectButton.style.display = 'block';
+            userProfile.style.display = 'none';
+            
+            // Сбрасываем данные профиля
+            userNickname.textContent = 'Anonymous';
+            userAddress.textContent = 'Not connected';
+            userAvatar.src = 'assets/default-avatar.png';
         }
     }
 

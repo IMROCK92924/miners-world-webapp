@@ -1,9 +1,10 @@
 {
   "url": "https://miners-world.com",
-  "name": "MinersWorld",
-  "iconUrl": "https://miners-world.com/assets/logo.png",
+  "name": "Miners World",
+  "iconUrl": "https://miners-world.com/favicon.ico",
   "termsOfUseUrl": "https://miners-world.com/terms",
   "privacyPolicyUrl": "https://miners-world.com/privacy",
+  "manifestVersion": "0.1",
   
   "items": [
     {

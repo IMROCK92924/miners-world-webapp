@@ -401,7 +401,7 @@ function openModal(name) {
         
         document.getElementById("energyCancel").onclick = () => modal.remove();
     } else if (name === "inventory") {
-        window.inventoryManager.show();
+        window.inventoryManager.show(true);
     } else {
         modal.style.backgroundImage = `url('assets/modal_${name}.png')`;
     }
@@ -491,7 +491,11 @@ async function initGame() {
         window.userManager = new UserManager();
         
         // Инициализируем обработчики событий
-        document.getElementById("inventory").onclick = () => openModal("inventory");
+        document.getElementById("inventory").onclick = () => {
+            if (window.inventoryManager) {
+                window.inventoryManager.show(true); // Показываем все NFT
+            }
+        };
         document.getElementById("market").onclick = () => openModal("market");
         document.getElementById("mining").onclick = () => openModal("settings");
         document.getElementById("home").onclick = () => {
