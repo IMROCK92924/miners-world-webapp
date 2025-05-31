@@ -32,7 +32,21 @@
   <link rel="stylesheet" href="style.css" />
   
   <!-- TON Connect и QR код -->
-  <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
+  <script>
+    // Проверка загрузки TON Connect SDK
+    window.tonConnectLoaded = false;
+    window.addEventListener('load', () => {
+      if (window.TonConnect) {
+        window.tonConnectLoaded = true;
+        console.log('TON Connect SDK loaded successfully');
+      } else {
+        console.error('TON Connect SDK failed to load');
+      }
+    });
+  </script>
+  <script src="https://unpkg.com/@tonconnect/sdk@2.1.3/dist/tonconnect-sdk.min.js" 
+          onerror="console.error('Failed to load TON Connect SDK')"
+          onload="console.log('TON Connect SDK script loaded')"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@latest/build/qrcode.min.js"></script>
   
   <style>

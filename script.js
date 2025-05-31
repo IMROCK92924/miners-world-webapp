@@ -325,17 +325,17 @@ function openModal(name) {
                 <div class="settings-section-title">
                     <i>💳</i> ${getText('wallet')}
                 </div>
-                ${tonConnector.isConnected ? `
-                    <div class="user-profile" style="position: relative; top: 0; right: 0;">
-                        <img class="user-avatar" src="${tonConnector.userProfile?.avatar || 'assets/default-avatar.png'}" alt="Avatar">
+                ${window.tonConnector && window.tonConnector.isConnected ? `
+                    <div class="user-profile">
+                        <img class="user-avatar" src="${window.tonConnector.userProfile?.avatar || 'assets/default-avatar.png'}" alt="Avatar">
                         <div class="user-info">
-                            <span class="user-nickname">${tonConnector.userProfile?.nickname || 'Anonymous'}</span>
-                            <span class="user-address">${tonConnector.userAddress ? `${tonConnector.userAddress.slice(0, 6)}...${tonConnector.userAddress.slice(-4)}` : ''}</span>
+                            <span class="user-nickname">${window.tonConnector.userProfile?.nickname || 'Anonymous'}</span>
+                            <span class="user-address">${window.tonConnector.userAddress ? `${window.tonConnector.userAddress.slice(0, 6)}...${window.tonConnector.userAddress.slice(-4)}` : ''}</span>
                         </div>
                     </div>
-                    <button class="settings-btn settings-cancel" onclick="tonConnector.disconnect()">${getText('disconnect')}</button>
+                    <button class="settings-btn settings-cancel" onclick="window.tonConnector.disconnect()">${getText('disconnect')}</button>
                 ` : `
-                    <button class="settings-btn settings-save" onclick="tonConnector.connect()">${getText('connect')}</button>
+                    <button class="settings-btn settings-save" onclick="window.tonConnector.connect()">${getText('connect')}</button>
                 `}
             </div>
             
@@ -343,7 +343,8 @@ function openModal(name) {
                 <div class="settings-section-title">
                     <i>👤</i> ${getText('nickname')}
                 </div>
-                <input type="text" class="nickname-input" value="${tonConnector.userProfile?.nickname || ''}" placeholder="Enter nickname">
+                <input type="text" class="nickname-input" value="${window.tonConnector?.userProfile?.nickname || ''}" 
+                       placeholder="Enter nickname" ${!window.tonConnector?.isConnected ? 'disabled' : ''}>
             </div>
             
             <div class="settings-section">
@@ -351,8 +352,10 @@ function openModal(name) {
                     <i>🌍</i> ${getText('language')}
                 </div>
                 <div class="language-selector">
-                    <button class="language-btn ${gameSettings.language === 'ru' ? 'active' : ''}" onclick="changeLanguage('ru')">Русский</button>
-                    <button class="language-btn ${gameSettings.language === 'en' ? 'active' : ''}" onclick="changeLanguage('en')">English</button>
+                    <button class="language-btn ${gameSettings.language === 'ru' ? 'active' : ''}" 
+                            onclick="changeLanguage('ru')">Русский</button>
+                    <button class="language-btn ${gameSettings.language === 'en' ? 'active' : ''}" 
+                            onclick="changeLanguage('en')">English</button>
                 </div>
             </div>
             

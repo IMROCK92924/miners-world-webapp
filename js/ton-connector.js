@@ -1,5 +1,8 @@
 class TONConnector {
     constructor() {
+        if (!window.TonConnect) {
+            throw new Error('TonConnect SDK not loaded');
+        }
         this.connector = null;
         this.userAddress = null;
         this.userProfile = null;
@@ -10,24 +13,40 @@ class TONConnector {
         try {
             console.log('Initializing TON Connect...');
             
+            // Создаем манифест для локальной разработки
+            const manifestContent = {
+                url: window.location.origin,
+                name: "Miners World",
+                iconUrl: `${window.location.origin}/assets/default-avatar.png`,
+                termsOfUseUrl: `${window.location.origin}/terms`,
+                privacyPolicyUrl: `${window.location.origin}/privacy`,
+                manifestVersion: "0.1",
+                items: [
+                    {
+                        name: "ton_addr",
+                        required: true
+                    },
+                    {
+                        name: "ton_proof",
+                        required: true
+                    }
+                ]
+            };
+
+            // Создаем Blob с манифестом
+            const manifestBlob = new Blob(
+                [JSON.stringify(manifestContent, null, 2)],
+                { type: 'application/json' }
+            );
+            const manifestUrl = URL.createObjectURL(manifestBlob);
+            
             // Инициализируем TON Connect
-            this.connector = new TonConnect();
-            
-            // Настраиваем конфигурацию для локальной разработки
-            const manifestUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-                ? `${window.location.origin}/tonconnect-manifest.json`
-                : 'https://miners-world.com/tonconnect-manifest.json';
-            
-            await this.connector.setConfiguration({
+            this.connector = new window.TonConnect({
                 manifestUrl,
-                walletsListSource: 'https://raw.githubusercontent.com/ton-blockchain/wallets-list/main/wallets.json',
-                retryConfig: {
-                    maxAttempts: 3,
-                    timeout: 3000
-                }
+                walletsListSource: 'https://raw.githubusercontent.com/ton-blockchain/wallets-list/main/wallets.json'
             });
             
-            console.log('TON Connect initialized with manifest:', manifestUrl);
+            console.log('TON Connect initialized with manifest:', manifestContent);
 
             // Подписываемся на изменения состояния подключения
             this.connector.onStatusChange((wallet) => {
@@ -45,6 +64,7 @@ class TONConnector {
             return true;
         } catch (error) {
             console.error('TON Connect initialization error:', error);
+            alert('Ошибка инициализации TON Connect. Пожалуйста, обновите страницу.');
             return false;
         }
     }
@@ -56,6 +76,10 @@ class TONConnector {
             if (this.isConnected) {
                 console.log('Already connected to wallet');
                 return true;
+            }
+
+            if (!this.connector) {
+                throw new Error('TON Connect not initialized');
             }
 
             // Получаем список доступных кошельков
@@ -98,27 +122,6 @@ class TONConnector {
                     // На десктопе показываем QR код
                     this.showQRModal(universalLink);
                 }
-
-                // Добавляем обработчик для проверки статуса подключения
-                let connectionCheckAttempts = 0;
-                const checkConnection = setInterval(async () => {
-                    try {
-                        const status = await this.connector.getWalletInfo();
-                        if (status && status.connected) {
-                            clearInterval(checkConnection);
-                            console.log('Connection successful');
-                            this.handleConnectionChange(status);
-                        } else {
-                            connectionCheckAttempts++;
-                            if (connectionCheckAttempts >= 30) { // 30 секунд таймаут
-                                clearInterval(checkConnection);
-                                throw new Error('Connection timeout');
-                            }
-                        }
-                    } catch (error) {
-                        console.error('Connection check error:', error);
-                    }
-                }, 1000);
 
                 return true;
             } catch (connectionError) {
