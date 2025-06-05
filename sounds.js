@@ -1,33 +1,39 @@
 // Управление звуками
 class SoundManager {
     constructor() {
-        this.sounds = {
-            buttonClick: new Audio('assets/sounds/button-click.mp3')
+        // Инициализируем звуки в глобальном объекте
+        window.sounds = {
+            click: new Audio('assets/sounds/button-click.mp3'),
+            success: new Audio('assets/sounds/success.mp3'),
+            error: new Audio('assets/sounds/error.mp3')
         };
         
         // Предзагрузка звуков
-        Object.values(this.sounds).forEach(audio => {
+        Object.values(window.sounds).forEach(audio => {
             audio.load();
         });
     }
 
-    playButtonClick() {
-        this.sounds.buttonClick.currentTime = 0; // Сброс времени для возможности быстрого повторного воспроизведения
-        this.sounds.buttonClick.play().catch(error => {
-            console.log('Error playing sound:', error);
-        });
+    playSound(soundName) {
+        const sound = window.sounds[soundName];
+        if (sound) {
+            sound.currentTime = 0;
+            sound.play().catch(error => {
+                console.log('Error playing sound:', error);
+            });
+        }
     }
 }
 
-// Создаем экземпляр менеджера звуков
-const soundManager = new SoundManager();
+// Создаем глобальный экземпляр менеджера звуков
+window.soundManager = new SoundManager();
 
 // Добавляем обработчики на все кнопки
 document.addEventListener('DOMContentLoaded', () => {
     const buttons = document.querySelectorAll('.btn');
     buttons.forEach(button => {
         button.addEventListener('click', () => {
-            soundManager.playButtonClick();
+            window.soundManager.playSound('click');
         });
     });
 }); 

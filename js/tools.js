@@ -179,9 +179,4 @@ class ToolSlotManager {
             }
         });
     }
-}
-
-// Создаем глобальный экземпляр после загрузки DOM
-document.addEventListener('DOMContentLoaded', () => {
-    window.toolSlotManager = new ToolSlotManager();
-}); 
+} 

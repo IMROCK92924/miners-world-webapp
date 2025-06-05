@@ -26,9 +26,6 @@ const gameState = {
   }
 };
 
-// TON Connect
-let tonConnector = null;
-
 // Глобальные настройки
 const gameSettings = {
     language: 'ru',
@@ -39,10 +36,6 @@ const gameSettings = {
 const translations = {
     ru: {
         settings: 'Настройки',
-        wallet: 'Кошелек',
-        connect: 'Подключить',
-        disconnect: 'Отключить',
-        nickname: 'Никнейм',
         language: 'Язык',
         referrals: 'Рефералы',
         save: 'Сохранить',
@@ -50,10 +43,6 @@ const translations = {
     },
     en: {
         settings: 'Settings',
-        wallet: 'Wallet',
-        connect: 'Connect',
-        disconnect: 'Disconnect',
-        nickname: 'Nickname',
         language: 'Language',
         referrals: 'Referrals',
         save: 'Save',
@@ -64,72 +53,6 @@ const translations = {
 // Функция для получения текста
 function getText(key) {
     return translations[gameSettings.language][key];
-}
-
-// Инициализация TON Connect
-async function initTONConnect() {
-  try {
-    tonConnector = new TONConnector();
-    
-    // Устанавливаем обработчики событий
-    tonConnector.onConnected = handleWalletConnected;
-    tonConnector.onDisconnected = handleWalletDisconnected;
-    
-    // Инициализируем коннектор
-    await tonConnector.initialize();
-    
-    // Настраиваем обработчик кнопки подключения
-    const connectButton = document.getElementById('connect-wallet');
-    connectButton.onclick = () => tonConnector.connect();
-    
-    return true;
-  } catch (error) {
-    console.error('TON Connect initialization error:', error);
-    return false;
-  }
-}
-
-// Обработчик успешного подключения кошелька
-function handleWalletConnected(profile) {
-  // Обновляем UI
-  document.getElementById('connect-wallet').style.display = 'none';
-  document.getElementById('user-profile').style.display = 'flex';
-  document.getElementById('user-nickname').textContent = profile.nickname;
-  document.getElementById('user-address').textContent = 
-    `${profile.address.slice(0, 6)}...${profile.address.slice(-4)}`;
-  document.getElementById('user-avatar').src = profile.avatar;
-  
-  // Загружаем данные пользователя
-  loadUserData(profile.address);
-}
-
-// Обработчик отключения кошелька
-function handleWalletDisconnected() {
-  // Обновляем UI
-  document.getElementById('connect-wallet').style.display = 'block';
-  document.getElementById('user-profile').style.display = 'none';
-  document.getElementById('user-nickname').textContent = 'Anonymous';
-  document.getElementById('user-address').textContent = 'Not connected';
-  document.getElementById('user-avatar').src = 'assets/default-avatar.png';
-  
-  // Сбрасываем данные пользователя
-  resetUserData();
-}
-
-// Загрузка данных пользователя
-async function loadUserData(address) {
-  try {
-    // Получаем данные пользователя из UserManager
-    const userData = await window.userManager.loadUserProgress(address);
-    if (userData) {
-      // Обновляем состояние игры
-      Object.assign(gameState, userData);
-      // Обновляем UI
-      updateUI();
-    }
-  } catch (error) {
-    console.error('Error loading user data:', error);
-  }
 }
 
 // Сброс данных пользователя
@@ -147,27 +70,16 @@ function resetUserData() {
 
 // Сохранение состояния
 function saveGameState() {
-  if (tonConnector && tonConnector.isConnected) {
-    // Если пользователь авторизован, сохраняем в его профиль
-    window.userManager.saveUserProgress(tonConnector.userAddress, gameState);
-  }
-  // В любом случае сохраняем локально
   localStorage.setItem('gameState', JSON.stringify(gameState));
 }
 
 // Загрузка состояния
 async function loadGameState() {
   try {
-    if (tonConnector && tonConnector.isConnected) {
-      // Если пользователь авторизован, загружаем его данные
-      await loadUserData(tonConnector.userAddress);
-    } else {
-      // Иначе загружаем локальные данные
-      const saved = localStorage.getItem('gameState');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        Object.assign(gameState, parsed);
-      }
+    const saved = localStorage.getItem('gameState');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      Object.assign(gameState, parsed);
     }
     updateUI();
   } catch (error) {
@@ -321,31 +233,6 @@ function openModal(name) {
         modal.innerHTML = `
             <h2 class="settings-header">${getText('settings')}</h2>
             
-            <div class="settings-section wallet-section">
-                <div class="settings-section-title">
-                    <i>💳</i> ${getText('wallet')}
-                </div>
-                ${window.tonConnector && window.tonConnector.isConnected ? `
-                    <div class="user-profile">
-                        <img class="user-avatar" src="${window.tonConnector.userProfile?.avatar || 'assets/default-avatar.png'}" alt="Avatar">
-                        <div class="user-info">
-                            <span class="user-nickname">${window.tonConnector.userProfile?.nickname || 'Anonymous'}</span>
-                            <span class="user-address">${window.tonConnector.userAddress ? `${window.tonConnector.userAddress.slice(0, 6)}...${window.tonConnector.userAddress.slice(-4)}` : ''}</span>
-                        </div>
-                    </div>
-                    <button class="settings-btn settings-cancel" onclick="window.tonConnector.disconnect()">${getText('disconnect')}</button>
-                ` : `
-                    <button class="settings-btn settings-save" onclick="window.tonConnector.connect()">${getText('connect')}</button>
-                `}
-            </div>
-            
-            <div class="settings-section">
-                <div class="settings-section-title">
-                    <i>👤</i> ${getText('nickname')}
-                </div>
-                <div class="nickname-display">${window.tonConnector?.userProfile?.nickname || 'Anonymous'}</div>
-            </div>
-            
             <div class="settings-section">
                 <div class="settings-section-title">
                     <i>🌍</i> ${getText('language')}
@@ -393,18 +280,20 @@ function openModal(name) {
             if (!isNaN(value) && value >= ENERGY_MIN && value <= ENERGY_MAX) {
                 setEnergyLevel(value);
                 playSound('success');
-                document.activeElement.blur();
-                modal.remove();
+                closeModal();
             } else {
                 playSound('error');
                 alert(`Введите число от ${ENERGY_MIN} до ${ENERGY_MAX}`);
             }
         };
         
-        document.getElementById("energyCancel").onclick = () => modal.remove();
+        document.getElementById("energyCancel").onclick = closeModal;
     } else if (name === "inventory") {
-        window.inventoryManager.show(true);
-    } else {
+        if (window.inventoryManager) {
+            window.inventoryManager.show(true);
+            return;
+        }
+    } else if (name === "market") {
         modal.style.backgroundImage = `url('assets/modal_${name}.png')`;
     }
     
@@ -414,7 +303,10 @@ function openModal(name) {
 // Функция закрытия модального окна
 function closeModal() {
     const modalContainer = document.getElementById("modal-container");
-    modalContainer.innerHTML = "";
+    if (modalContainer) {
+        modalContainer.innerHTML = "";
+    }
+    playSound('click');
 }
 
 // Функция изменения языка
@@ -425,13 +317,7 @@ function changeLanguage(lang) {
 }
 
 // Функция сохранения настроек
-async function saveSettings() {
-    // Сохраняем никнейм
-    const nicknameInput = document.querySelector('.nickname-input');
-    if (nicknameInput && tonConnector.userProfile) {
-        tonConnector.userProfile.nickname = nicknameInput.value;
-    }
-    
+function saveSettings() {
     // Сохраняем настройки в localStorage
     localStorage.setItem('gameSettings', JSON.stringify(gameSettings));
     
@@ -478,52 +364,23 @@ const handleResize = debounce(() => {
   scaleGame();
 }, 250);
 
-// Добавляем функцию проверки подключения кошелька
-function checkWalletConnection() {
-    if (!window.tonConnector || !window.tonConnector.isConnected) {
-        openModal('settings');
-        return false;
-    }
-    return true;
-}
-
-// Обновляем инициализацию игры
+// Обновляем функцию initGame
 async function initGame() {
     console.log('Initializing game...');
     
     try {
-        // Загружаем настройки
+        // Загружаем настройки и состояние
         loadSettings();
+        await loadGameState();
         
-        // Инициализируем TON Connect
-        await initTONConnect();
+        // Инициализируем менеджеры
+        window.toolSlotManager = new ToolSlotManager();
+        window.inventoryManager = new InventoryManager();
+        window.soundManager = new SoundManager();
         
-        // Создаем экземпляр UserManager
-        window.userManager = new UserManager();
+        // Инициализируем обработчики событий
+        initializeEventHandlers();
         
-        // Инициализируем обработчики событий с проверкой подключения кошелька
-        document.getElementById("inventory").onclick = () => {
-            if (checkWalletConnection() && window.inventoryManager) {
-                window.inventoryManager.show(true);
-            }
-        };
-        document.getElementById("market").onclick = () => {
-            if (checkWalletConnection()) {
-                openModal("market");
-            }
-        };
-        document.getElementById("mining").onclick = () => openModal("settings");
-        document.getElementById("home").onclick = () => {
-            if (checkWalletConnection()) {
-                document.getElementById("modal-container").innerHTML = "";
-            }
-        };
-        document.getElementById("plusButton").onclick = () => {
-            if (checkWalletConnection()) {
-                openModal("energy");
-            }
-        };
-
         // Настраиваем масштабирование
         scaleGame();
         if (window.visualViewport) {
@@ -531,18 +388,29 @@ async function initGame() {
         }
         window.addEventListener("resize", handleResize);
         
-        // Проверяем подключение кошелька при старте
-        if (!window.tonConnector || !window.tonConnector.isConnected) {
-            openModal('settings');
+        // Показываем игру
+        const wrapper = document.querySelector('.wrapper');
+        if (wrapper) {
+            wrapper.style.display = 'block';
+            wrapper.style.opacity = '1';
+            wrapper.style.visibility = 'visible';
         }
         
-        // Инициализируем загрузчик ресурсов
-        initLoader(onResourcesLoaded);
+        // Обновляем отображение
+        updateUI();
         
     } catch (error) {
         console.error('Game initialization error:', error);
-        alert('Failed to initialize game. Please refresh the page.');
     }
+}
+
+// Выносим инициализацию обработчиков событий в отдельную функцию
+function initializeEventHandlers() {
+    document.getElementById("inventory").onclick = () => openModal("inventory");
+    document.getElementById("market").onclick = () => openModal("market");
+    document.getElementById("mining").onclick = () => openModal("settings");
+    document.getElementById("home").onclick = closeModal;
+    document.getElementById("plusButton").onclick = () => openModal("energy");
 }
 
 // Callback после загрузки ресурсов
@@ -550,8 +418,21 @@ function onResourcesLoaded(cache) {
     console.log('Resources loaded, starting game...');
     
     // Скрываем экран загрузки
-    document.getElementById('loading-screen').style.display = 'none';
-    document.querySelector('.wrapper').style.display = 'block';
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+        loadingScreen.style.opacity = '0';
+        loadingScreen.style.visibility = 'hidden';
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+            // Показываем основной контент
+            const wrapper = document.querySelector('.wrapper');
+            if (wrapper) {
+                wrapper.style.display = 'block';
+                wrapper.style.opacity = '1';
+                wrapper.style.visibility = 'visible';
+            }
+        }, 300); // Ждем завершения анимации
+    }
     
     // Инициализируем менеджеры
     window.toolSlotManager = new ToolSlotManager();
@@ -562,17 +443,25 @@ function onResourcesLoaded(cache) {
     
     // Запускаем автосохранение
     setInterval(() => {
-        window.userManager.saveProgress();
+        saveGameState();
     }, 60000); // Каждую минуту
 }
 
 // Обновление отображения ресурсов
 function updateResourceDisplay() {
-    const resources = window.userManager.userProgress.resources;
-    
-    document.getElementById('fel').textContent = resources.FEL;
-    document.getElementById('irid').textContent = resources.MITHRIL;
-    document.getElementById('rubid').textContent = resources.RUBIDIUM;
+    try {
+        const resources = gameState.resources || {
+            fel: 0,
+            irid: 0,
+            rubid: 0
+        };
+        
+        document.getElementById('fel').textContent = resources.fel || 0;
+        document.getElementById('irid').textContent = resources.irid || 0;
+        document.getElementById('rubid').textContent = resources.rubid || 0;
+    } catch (error) {
+        console.error('Error updating resource display:', error);
+    }
 }
 
 // Запускаем игру при загрузке страницы

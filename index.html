@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport"
@@ -31,22 +31,10 @@
   <link rel="stylesheet" href="loading.css" />
   <link rel="stylesheet" href="style.css" />
   
-  <!-- TON Connect и QR код -->
-  <script>
-    // Проверка загрузки TON Connect SDK
-    window.tonConnectLoaded = false;
-    window.addEventListener('load', () => {
-      if (window.TonConnect) {
-        window.tonConnectLoaded = true;
-        console.log('TON Connect SDK loaded successfully');
-      } else {
-        console.error('TON Connect SDK failed to load');
-      }
-    });
-  </script>
-  <script src="https://unpkg.com/@tonconnect/sdk@2.1.3/dist/tonconnect-sdk.min.js" 
-          onerror="console.error('Failed to load TON Connect SDK')"
-          onload="console.log('TON Connect SDK script loaded')"></script>
+  <!-- TON Connect SDK -->
+  <script src="https://tonconnect.org/sdk.js"></script>
+  
+  <!-- QR Code Generator -->
   <script src="https://cdn.jsdelivr.net/npm/qrcode@latest/build/qrcode.min.js"></script>
   
   <style>
@@ -54,39 +42,60 @@
     html, body {
       touch-action: manipulation;
     }
+
+    /* Встроенные стили для мгновенного показа экрана загрузки */
+    #initial-loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
+    #initial-loading-text {
+      color: #00ffff;
+      font-size: 24px;
+      text-shadow: 0 0 10px #00ffff;
+    }
   </style>
 </head>
 <body>
-  <!-- Loading Screen -->
-  <div id="loading-screen" class="loading-screen">
-    <div class="loading-background"></div>
+  <!-- Начальный экран загрузки -->
+  <div id="initial-loading">
+    <div id="initial-loading-text">Loading...</div>
+  </div>
+
+  <!-- TON Connect Button Container -->
+  <div id="connect-wallet-button" style="display: none;"></div>
+  
+  <!-- Основной экран загрузки -->
+  <div id="loading-screen" style="display: none;">
     <div class="loading-content">
-      <!-- Временно уберем логотип -->
-      <!-- <img src="assets/ui/logo.png" alt="MinningFarm" class="loading-logo"> -->
-      <div class="loading-text">Loading Game</div>
+      <div class="loading-background"></div>
+      <div class="loading-text">Loading game...</div>
       <div class="loading-bar-container">
         <div class="loading-bar"></div>
       </div>
-      <div class="loading-details" id="loading-details">Preparing resources...</div>
+      <div id="loading-details">Preparing resources...</div>
       <div class="loading-categories">
-        <div class="loading-category" id="cat-interface">
-          <div class="loading-category-icon">🖥️</div>
-          <div class="loading-category-label">Interface</div>
+        <div id="cat-interface" class="loading-category">
+          <span class="loading-category-icon">🖥️</span>
+          <span class="loading-category-label">Interface</span>
         </div>
-        <div class="loading-category" id="cat-graphics">
-          <div class="loading-category-icon">🎨</div>
-          <div class="loading-category-label">Graphics</div>
+        <div id="cat-graphics" class="loading-category">
+          <span class="loading-category-icon">🎨</span>
+          <span class="loading-category-label">Graphics</span>
         </div>
-        <div class="loading-category" id="cat-nft">
-          <div class="loading-category-icon">🎮</div>
-          <div class="loading-category-label">NFT</div>
-        </div>
-        <div class="loading-category" id="cat-sounds">
-          <div class="loading-category-icon">🔊</div>
-          <div class="loading-category-label">Sounds</div>
+        <div id="cat-nft" class="loading-category">
+          <span class="loading-category-icon">🎮</span>
+          <span class="loading-category-label">NFT</span>
         </div>
       </div>
-      <div id="loading-progress" class="loading-text">0%</div>
+      <div id="loading-progress">0%</div>
     </div>
   </div>
 
@@ -115,7 +124,7 @@
 
         <!-- Energy -->
         <div class="energy-wrapper">
-          <img id="energyBar" src="assets/energy/energy_0.png" alt="Energy bar">
+          <img id="energyBar" src="assets/energy/energy_3.png" alt="Energy bar">
           <img id="plusButton" src="assets/ui/plus.png" alt="+" class="energy-plus">
         </div>
 
@@ -125,22 +134,55 @@
         </div>
 
         <!-- Buttons -->
-        <img src="assets/btn_market.png" class="btn" id="market" />
-        <img src="assets/btn_home.png" class="btn" id="home" />
-        <img src="assets/btn_inventory.png" class="btn" id="inventory" />
-        <img src="assets/btn_settings.png" class="btn" id="mining" title="Settings" />
+        <img src="assets/btn_market.png" class="btn" id="market" alt="Market" />
+        <img src="assets/btn_home.png" class="btn" id="home" alt="Home" />
+        <img src="assets/btn_inventory.png" class="btn" id="inventory" alt="Inventory" />
+        <img src="assets/btn_mining.png" class="btn" id="mining" alt="Settings" />
       </div>
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="js/nft-config.js"></script>
-  <script src="js/user-manager.js"></script>
-  <script src="js/ton-connector.js"></script>
+  <!-- Скрипты -->
   <script src="loading.js"></script>
   <script src="sounds.js"></script>
+  <script src="js/nft-config.js"></script>
   <script src="js/tools.js"></script>
   <script src="js/inventory.js"></script>
+  <script src="js/user-manager.js"></script>
   <script src="script.js"></script>
+
+  <script>
+    // Скрипт для управления начальным экраном загрузки
+    document.addEventListener('DOMContentLoaded', function() {
+      const initialLoading = document.getElementById('initial-loading');
+      const mainLoadingScreen = document.getElementById('loading-screen');
+      
+      // Показываем основной экран загрузки
+      mainLoadingScreen.style.display = 'flex';
+      
+      // Плавно скрываем начальный экран загрузки
+      setTimeout(() => {
+        initialLoading.style.opacity = '0';
+        setTimeout(() => {
+          initialLoading.style.display = 'none';
+        }, 300);
+      }, 100);
+    });
+  </script>
+
+  <script>
+    // Инициализация игры
+    document.addEventListener('DOMContentLoaded', function() {
+      // Показываем основной экран загрузки
+      const loadingScreen = document.getElementById('loading-screen');
+      loadingScreen.style.display = 'flex';
+      
+      // Инициализируем загрузчик
+      window.initLoader(function(cache) {
+        // После загрузки ресурсов инициализируем игру
+        window.initGame();
+      });
+    });
+  </script>
 </body>
 </html>

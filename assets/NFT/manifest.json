@@ -1,0 +1,19 @@
+{
+  "url": "https://miners-world.com",
+  "name": "Miners World",
+  "iconUrl": "https://miners-world.com/assets/ui/logo.png",
+  "termsOfUseUrl": "https://miners-world.com/terms",
+  "privacyPolicyUrl": "https://miners-world.com/privacy",
+  "manifestVersion": "0.1",
+  
+  "items": [
+    {
+      "name": "ton_addr",
+      "required": true
+    },
+    {
+      "name": "ton_proof",
+      "required": true
+    }
+  ]
+} 

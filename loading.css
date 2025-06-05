@@ -15,23 +15,41 @@
   justify-content: center;
   align-items: center;
   z-index: 9999;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .loading-content {
   width: 80%;
   max-width: 400px;
   position: relative;
+  text-align: center;
+  color: var(--primary-color);
+  opacity: 1;
+  visibility: visible;
 }
 
 .loading-background {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: url('assets/backgroundload.png') center center;
+  background: url('assets/backgroundload.png') center center no-repeat;
   background-size: cover;
   z-index: -1;
+  opacity: 0.3;
+  will-change: opacity;
+}
+
+.loading-text {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px var(--primary-color);
+  opacity: 1;
+  visibility: visible;
+  will-change: transform, opacity;
 }
 
 .loading-bar-container {
@@ -40,11 +58,11 @@
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   overflow: hidden;
-  position: absolute;
-  top: -215px;
-  left: 0%;
-  transform: none;
-  margin: 0;
+  margin: 20px auto;
+  position: relative;
+  opacity: 1;
+  visibility: visible;
+  will-change: transform;
 }
 
 .loading-bar {
@@ -54,14 +72,36 @@
   border-radius: 10px;
   transition: width 0.3s ease;
   animation: glow 1.5s ease-in-out infinite;
+  opacity: 1;
+  visibility: visible;
+  will-change: width, transform;
 }
 
-/* Скрываем все остальные элементы */
-.loading-text,
-.loading-details,
-.loading-categories,
+.loading-details {
+  font-size: 16px;
+  margin: 10px 0;
+  opacity: 0.8;
+  visibility: visible;
+  will-change: opacity;
+}
+
+.loading-categories {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  opacity: 1;
+  visibility: visible;
+  will-change: transform;
+}
+
 #loading-progress {
-  display: none;
+  font-size: 20px;
+  margin-top: 20px;
+  font-weight: bold;
+  opacity: 1;
+  visibility: visible;
+  will-change: opacity;
 }
 
 @keyframes glow {
@@ -80,6 +120,9 @@
 /* Дополнительные свойства для точного позиционирования */
 .loading-content > * {
   transform: translate(0, 0);
+  opacity: 1;
+  visibility: visible;
+  will-change: transform, opacity;
 }
 
 /* Можно использовать position: absolute для полного контроля над позиционированием */
@@ -102,6 +145,8 @@
   margin: 5px 0;
   opacity: 0.7;
   transition: all 0.3s ease;
+  visibility: visible;
+  will-change: transform, opacity;
 }
 
 .loading-category.active {
@@ -111,11 +156,46 @@
   box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
 }
 
+.loading-category-icon {
+  font-size: 24px;
+}
+
+.loading-category-label {
+  font-size: 16px;
+}
+
 #cat-nft {
-  color: #a335ee; /* Фиолетовый цвет для NFT */
+  color: #a335ee;
 }
 
 #cat-nft .loading-category-icon {
   color: #a335ee;
   text-shadow: 0 0 5px #a335ee;
+}
+
+/* Оптимизация для мобильных устройств */
+@media (max-width: 768px) {
+  .loading-content {
+    width: 90%;
+  }
+  
+  .loading-text {
+    font-size: 20px;
+  }
+  
+  .loading-bar-container {
+    height: 15px;
+  }
+  
+  .loading-category {
+    padding: 8px;
+  }
+}
+
+/* Стили для wrapper */
+.wrapper {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  will-change: opacity, visibility;
 } 

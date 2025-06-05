@@ -8,20 +8,27 @@ const RESOURCE_CATEGORIES = {
   sounds: ['.mp3', '.wav']
 };
 
-// Resources to preload
+// Критически важные ресурсы загружаем первыми
+const CRITICAL_RESOURCES = [
+  'assets/background.png',
+  'assets/ui/plus.png',
+  'assets/btn_market.png',
+  'assets/btn_home.png',
+  'assets/btn_inventory.png',
+  'assets/btn_mining.png'
+];
+
+// Остальные ресурсы
 const RESOURCES = {
   images: [
-    'assets/background.png',
-    'assets/ui/plus.png',
-    'assets/btn_home.png',
-    'assets/btn_inventory.png',
-    'assets/btn_market.png',
-    'assets/btn_mining.png',
+    // Энергия
+    ...Array.from({length: 11}, (_, i) => `assets/energy/energy_${i}.png`),
+    
+    // Модальные окна
     'assets/modal_energy.png',
     'assets/modal_inventory.png',
     'assets/modal_market.png',
-    'assets/modal_mining.png',
-    ...Array.from({length: 11}, (_, i) => `assets/energy/energy_${i}.png`)
+    'assets/modal_mining.png'
   ],
   nft: [],
   sounds: []
@@ -163,8 +170,7 @@ async function preloadImage(src) {
 // Resource loader
 class ResourceLoader {
   constructor(onComplete) {
-    this.nftLoaded = false;
-    this.totalResources = RESOURCES.images.length + RESOURCES.sounds.length;
+    this.totalResources = CRITICAL_RESOURCES.length + RESOURCES.images.length;
     this.loadedResources = 0;
     this.currentCategory = '';
     this.cache = {
@@ -173,9 +179,13 @@ class ResourceLoader {
       nft: {}
     };
     this.onComplete = onComplete;
-    this.startTime = Date.now();
-    this.minLoadingTime = 3000; // Minimum loading time - 3 seconds
-    console.log('Loader initialized. Total resources:', this.totalResources);
+    
+    // Показываем основной экран загрузки
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+      loadingScreen.style.display = 'flex';
+      loadingScreen.style.opacity = '1';
+    }
   }
 
   getResourceCategory(src) {
@@ -184,7 +194,7 @@ class ResourceLoader {
         return category;
       }
     }
-    return 'graphics'; // Default
+    return 'graphics';
   }
 
   updateLoadingDetails(src) {
@@ -196,7 +206,6 @@ class ResourceLoader {
 
     const category = this.getResourceCategory(src);
     if (category !== this.currentCategory) {
-      // Update active category
       document.querySelectorAll('.loading-category').forEach(el => {
         el.classList.remove('active');
       });
@@ -210,7 +219,6 @@ class ResourceLoader {
 
   updateProgress() {
     const progress = Math.round((this.loadedResources / this.totalResources) * 100);
-    console.log('Loading progress:', progress + '%');
     
     const progressElement = document.getElementById('loading-progress');
     const barElement = document.querySelector('.loading-bar');
@@ -218,211 +226,131 @@ class ResourceLoader {
     if (progressElement && barElement) {
       progressElement.textContent = `${progress}%`;
       barElement.style.width = `${progress}%`;
-    } else {
-      console.error('Progress elements not found');
     }
     
     if (progress === 100) {
-      console.log('Loading complete');
       document.getElementById('loading-details').textContent = 'Loading complete!';
       
-      const elapsedTime = Date.now() - this.startTime;
-      const remainingTime = Math.max(0, this.minLoadingTime - elapsedTime);
+      // Показываем игру
+      const wrapper = document.querySelector('.wrapper');
+      if (wrapper) {
+        wrapper.style.display = 'block';
+        wrapper.style.opacity = '1';
+        wrapper.style.visibility = 'visible';
+      }
       
-      setTimeout(() => {
-        if (typeof this.onComplete === 'function') {
-          this.onComplete(this.cache);
-        }
-      }, remainingTime);
+      // Скрываем экраны загрузки
+      const initialLoading = document.getElementById('initial-loading');
+      const loadingScreen = document.getElementById('loading-screen');
+      
+      if (initialLoading) {
+        initialLoading.style.opacity = '0';
+        setTimeout(() => {
+          initialLoading.style.display = 'none';
+        }, 300);
+      }
+      
+      if (loadingScreen) {
+        loadingScreen.style.opacity = '0';
+        setTimeout(() => {
+          loadingScreen.style.display = 'none';
+        }, 300);
+      }
+      
+      if (typeof this.onComplete === 'function') {
+        this.onComplete(this.cache);
+      }
     }
-    
-    return progress === 100;
   }
 
   async loadImage(src) {
-    console.log('Loading image:', src);
-    this.updateLoadingDetails(src);
-    
     try {
-      // Проверяем наличие изображения в кэше
+      this.updateLoadingDetails(src);
+      
       if (this.cache.images[src]) {
-        console.log('Image found in cache:', src);
         return this.cache.images[src];
       }
 
-      const img = await preloadImage(src);
-      
-      if (img) {
-        console.log('Image loaded and cached:', src);
-        this.cache.images[src] = img;
-        this.loadedResources++;
-        this.updateProgress();
-        return img;
-      } else {
-        throw new Error('Image loading failed');
-      }
+      const img = new Image();
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error(`Timeout loading image: ${src}`));
+        }, 5000);
+
+        img.onload = () => {
+          clearTimeout(timeout);
+          resolve();
+        };
+        img.onerror = () => {
+          clearTimeout(timeout);
+          reject(new Error(`Failed to load image: ${src}`));
+        };
+        img.src = src;
+      });
+
+      this.cache.images[src] = img;
+      this.loadedResources++;
+      this.updateProgress();
+      return img;
     } catch (error) {
       console.error('Error loading image:', src, error);
-      
-      // Для NFT изображений пробуем загрузить резервное изображение
-      if (src.includes('/nft/')) {
-        console.log('Attempting to load fallback image for NFT');
-        try {
-          // Пробуем разные форматы
-          const formats = ['webp', 'png', 'jpg'];
-          for (const format of formats) {
-            const fallbackSrc = `assets/nft/fallback.${format}`;
-            try {
-              const fallbackImg = await preloadImage(fallbackSrc);
-              if (fallbackImg) {
-                this.cache.images[src] = fallbackImg;
-                break;
-              }
-            } catch (e) {
-              console.log(`Failed to load ${format} fallback`);
-            }
-          }
-        } catch (fallbackError) {
-          console.error('All fallback image attempts failed:', fallbackError);
-        }
-      }
-      
       this.loadedResources++;
       this.updateProgress();
       return null;
     }
   }
 
-  loadSound(src) {
-    console.log('Loading sound:', src);
-    this.updateLoadingDetails(src);
-    return new Promise((resolve, reject) => {
-      const audio = new Audio();
-      audio.oncanplaythrough = () => {
-        console.log('Sound loaded:', src);
-        this.cache.sounds[src] = audio;
-        this.loadedResources++;
-        this.updateProgress();
-        resolve(audio);
-      };
-      audio.onerror = (error) => {
-        console.error('Error loading sound:', src, error);
-        this.loadedResources++;
-        this.updateProgress();
-        reject(error);
-      };
-      audio.src = src;
-    });
-  }
-
-  async loadNFTImages() {
+  async loadSound(src) {
     try {
-      console.log('Starting NFT images loading...');
+      this.updateLoadingDetails(src);
       
-      // Загружаем только NFT из инвентаря пользователя и базовые NFT
-      const userNFTs = window.userManager?.userInventory?.getItems() || [];
-      const nftIds = new Set(userNFTs.map(nft => nft.id));
+      const audio = new Audio();
       
-      // Получаем все NFT из конфигурации
-      const allNFTs = window.NFTManager.getAllNFTs();
+      await new Promise((resolve, reject) => {
+        audio.oncanplaythrough = resolve;
+        audio.onerror = reject;
+        audio.src = src;
+      });
+
+      console.log('Sound loaded successfully:', src);
+      this.cache.sounds[src] = audio;
+      this.loadedResources++;
+      this.updateProgress();
+      return audio;
       
-      // Фильтруем NFT: берем все common и те, что есть у пользователя
-      const availableNFTs = allNFTs.filter(nft => 
-        nft.rarity === 'common' || nftIds.has(nft.id)
-      );
-      
-      RESOURCES.nft = availableNFTs.map(nft => nft.image);
-      this.totalResources += RESOURCES.nft.length;
-      
-      console.log('NFT config loaded, total NFTs:', RESOURCES.nft.length);
-      
-      // На мобильных устройствах загружаем по одному
-      const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      const batchSize = isMobile ? 1 : 3;
-      
-      for (let i = 0; i < RESOURCES.nft.length; i += batchSize) {
-        const batch = RESOURCES.nft.slice(i, i + batchSize);
-        console.log(`Loading NFT batch ${i/batchSize + 1} of ${Math.ceil(RESOURCES.nft.length/batchSize)}`);
-        
-        try {
-          const results = await Promise.all(
-            batch.map(async nftPath => {
-              try {
-                return await this.loadImage(nftPath);
-              } catch (error) {
-                console.error(`Failed to load NFT: ${nftPath}`, error);
-                return null;
-              }
-            })
-          );
-          
-          console.log(`Batch ${i/batchSize + 1} results:`, results);
-          
-          // На мобильных устройствах делаем паузу между загрузками
-          if (isMobile) {
-            await new Promise(resolve => setTimeout(resolve, 200));
-          }
-        } catch (batchError) {
-          console.error(`Error loading batch ${i/batchSize + 1}:`, batchError);
-        }
-      }
-      
-      this.nftLoaded = true;
-      console.log('All NFT images loading completed');
     } catch (error) {
-      console.error('Error in loadNFTImages:', error);
-      this.nftLoaded = true;
+      console.error('Error loading sound:', src, error);
+      this.loadedResources++;
+      this.updateProgress();
+      return null;
     }
   }
 
   async loadAll() {
-    console.log('Starting to load all resources');
-    document.getElementById('loading-details').textContent = 'Preparing resources...';
-    
     try {
-      const [basicResourcesResult] = await Promise.all([
-        Promise.all([
-          ...RESOURCES.images.map(src => 
-            this.loadImage(src).catch(error => {
-              console.error('Resource loading error:', src, error);
-              return null;
-            })
-          ),
-          ...RESOURCES.sounds.map(src => 
-            this.loadSound(src).catch(error => {
-              console.error('Resource loading error:', src, error);
-              return null;
-            })
-          )
-        ]),
-        this.loadNFTImages()
-      ]);
-
-      const failedResources = basicResourcesResult.filter(r => r === null).length;
-      
-      if (failedResources > 0) {
-        console.warn(`Loading completed with ${failedResources} errors`);
-      } else {
-        console.log('All resources loaded successfully');
+      // Загружаем критически важные ресурсы последовательно
+      for (const src of CRITICAL_RESOURCES) {
+        await this.loadImage(src);
       }
-      
+
+      // Загружаем остальные ресурсы параллельно
+      await Promise.all(RESOURCES.images.map(src => this.loadImage(src)));
+
       return true;
     } catch (error) {
-      console.error('Critical loading error:', error);
+      console.error('Loading error:', error);
       return false;
     }
   }
 }
 
-// Loader initialization function
+// Инициализация загрузчика
 function initLoader(onComplete) {
-  console.log('Initializing resource loader');
+  console.log('Initializing resource loader...');
   const loader = new ResourceLoader(onComplete);
   loader.loadAll().catch(error => {
-    console.error('Loader initialization error:', error);
-    alert('Resource loading error. Please refresh the page.');
+    console.error('Loader error:', error);
   });
 }
 
-// Export function for use in main script
 window.initLoader = initLoader; 

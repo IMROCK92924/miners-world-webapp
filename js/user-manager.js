@@ -2,7 +2,15 @@ class UserManager {
     constructor() {
         this.currentUser = null;
         this.userInventory = null;
-        this.userProgress = null;
+        this.userProgress = {
+            resources: {
+                FEL: 0,
+                MITHRIL: 0,
+                RUBIDIUM: 0
+            },
+            energy: 3,
+            lastUpdate: Date.now()
+        };
     }
 
     // Авторизация пользователя

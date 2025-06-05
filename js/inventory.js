@@ -87,7 +87,7 @@ class InventoryManager {
     }
 }
 
-// Создаем глобальный экземпляр после загрузки DOM
-document.addEventListener('DOMContentLoaded', () => {
-    window.inventoryManager = new InventoryManager();
-}); 
+// Удаляем дублирующую инициализацию, так как она происходит в onResourcesLoaded
+// document.addEventListener('DOMContentLoaded', () => {
+//     window.inventoryManager = new InventoryManager();
+// }); 

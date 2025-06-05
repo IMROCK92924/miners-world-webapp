@@ -205,36 +205,40 @@ const NFT_CONFIG = {
     }
 };
 
-// Вспомогательные функции для работы с NFT
-const NFTManager = {
-    // Получить все NFT
-    getAllNFTs() {
-        return Object.values(NFT_CONFIG);
-    },
-
-    // Получить NFT по ID
-    getNFTById(id) {
-        return Object.values(NFT_CONFIG).find(nft => nft.id === id);
-    },
-
-    // Получить NFT по типу ресурса
-    getNFTsByResourceType(resourceType) {
-        return Object.values(NFT_CONFIG).filter(nft => nft.resourceType === resourceType);
-    },
-
-    // Получить NFT по редкости
-    getNFTsByRarity(rarity) {
-        return Object.values(NFT_CONFIG).filter(nft => nft.rarity === rarity);
-    },
-
-    // Создать новый экземпляр NFT (с текущими значениями)
-    createNFTInstance(id) {
-        const nft = this.getNFTById(id);
-        if (!nft) return null;
-        return JSON.parse(JSON.stringify(nft)); // Создаем глубокую копию
+// NFT Manager Class
+class NFTManager {
+    static getAllNFTs() {
+        return Object.values(NFT_CONFIG).map(nft => ({...nft}));
     }
-};
 
-// Экспортируем конфигурацию и менеджер
-window.NFT_CONFIG = NFT_CONFIG;
+    static getNFTById(id) {
+        const nft = Object.values(NFT_CONFIG).find(nft => nft.id === id);
+        return nft ? {...nft} : null;
+    }
+
+    static getNFTsByResourceType(resourceType) {
+        return Object.values(NFT_CONFIG)
+            .filter(nft => nft.resourceType === resourceType)
+            .map(nft => ({...nft}));
+    }
+
+    static getNFTsByRarity(rarity) {
+        return Object.values(NFT_CONFIG)
+            .filter(nft => nft.rarity === rarity)
+            .map(nft => ({...nft}));
+    }
+
+    static createNFTInstance(id) {
+        const baseNFT = this.getNFTById(id);
+        if (!baseNFT) return null;
+        
+        return {
+            ...baseNFT,
+            acquiredAt: Date.now(),
+            durability: {...baseNFT.durability}
+        };
+    }
+}
+
+// Экспортируем NFTManager в глобальную область видимости
 window.NFTManager = NFTManager; 

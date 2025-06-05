@@ -1,9 +1,9 @@
 {
-  "url": "https://miners-world.com",
+  "url": "http://127.0.0.1:5500",
   "name": "Miners World",
-  "iconUrl": "https://miners-world.com/favicon.ico",
-  "termsOfUseUrl": "https://miners-world.com/terms",
-  "privacyPolicyUrl": "https://miners-world.com/privacy",
+  "iconUrl": "http://127.0.0.1:5500/assets/ui/logo.png",
+  "termsOfUseUrl": "http://127.0.0.1:5500/terms",
+  "privacyPolicyUrl": "http://127.0.0.1:5500/privacy",
   "manifestVersion": "0.1",
   
   "items": [
